@@ -1,0 +1,1460 @@
+<!doctype html>
+<html lang="en" id="htmlRoot">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KPI Importance Form</title>
+<style>
+/* Layout concept: one calm column of numbered steps; the answer buttons are the main object, everything else stays quiet. */
+:root{
+  --bg:#f3f6f6; --surface:#ffffff; --surface-2:#eaf0f0; --ink:#14262b; --muted:#52666b; --line:#cfdbdc;
+  --accent:#0b6b6a; --accent-ink:#ffffff; --accent-soft:#d6eeec;
+  --ok:#1b7443; --ok-soft:#dcf2e5; --warn:#8f5200; --warn-soft:#fbeccd; --bad:#a3302b; --bad-soft:#f8dddb;
+  --off:#7d8f93;
+  --ca:#0b6b6a; --ca-soft:#d6eeec; --ca-bar:#0b6b6a; --cb:#8f5200; --cb-soft:#fbeccd; --cb-bar:#c77a12;
+  --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Noto Sans Devanagari",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1a1c; --surface:#152225; --surface-2:#1b2d31; --ink:#e5efef; --muted:#9db3b6; --line:#2a4146;
+    --accent:#4fc4c0; --accent-ink:#052321; --accent-soft:#163a3b;
+    --ok:#62d08c; --ok-soft:#14301f; --warn:#f0b45c; --warn-soft:#3a2a0e; --bad:#f2918b; --bad-soft:#3b1816;
+    --off:#5d7478; color-scheme:dark;
+    --ca:#4fc4c0; --ca-soft:#163a3b; --ca-bar:#4fc4c0; --cb:#f0b45c; --cb-soft:#3a2a0e; --cb-bar:#f0b45c;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1a1c; --surface:#152225; --surface-2:#1b2d31; --ink:#e5efef; --muted:#9db3b6; --line:#2a4146;
+  --accent:#4fc4c0; --accent-ink:#052321; --accent-soft:#163a3b;
+  --ok:#62d08c; --ok-soft:#14301f; --warn:#f0b45c; --warn-soft:#3a2a0e; --bad:#f2918b; --bad-soft:#3b1816;
+  --off:#5d7478; color-scheme:dark;
+  --ca:#4fc4c0; --ca-soft:#163a3b; --ca-bar:#4fc4c0; --cb:#f0b45c; --cb-soft:#3a2a0e; --cb-bar:#f0b45c;
+}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--font);padding-inline:16px;padding-block:20px 64px;font-variant-numeric:tabular-nums;margin:0}
+.wrap{max-width:760px;margin-inline:auto;display:grid;gap:16px}
+h1{font-size:26px;line-height:1.2;margin:0;text-wrap:balance}
+h2{font-size:18px;line-height:1.3;margin:0;text-wrap:balance}
+h3{font-size:15px;margin:0 0 2px}
+p{margin:0}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.lede{color:var(--muted);max-width:62ch}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+button{font:inherit;color:inherit}
+button,input,select,textarea{min-width:0}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.head{display:grid;gap:8px}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:12px;min-width:0}
+.step.locked{opacity:.6}
+.step-h{display:flex;gap:12px;align-items:center}
+.n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-weight:700;font-size:14px}
+.step-h h2{flex:1}
+.chip{flex:none;font-size:12px;font-weight:600;padding:2px 10px;border-radius:99px;background:var(--surface-2);color:var(--muted)}
+.chip.done{background:var(--ok-soft);color:var(--ok)}
+.chip.todo{background:var(--warn-soft);color:var(--warn)}
+
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:520px){.row2{grid-template-columns:1fr}}
+label.f{display:grid;gap:4px;font-size:14px;font-weight:600;min-width:0;align-content:start}
+input[type=text],select,textarea{width:100%;font:inherit;font-weight:400;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:9px 10px}
+textarea{font-family:var(--mono);font-size:12px;line-height:1.5;white-space:pre;overflow:auto;resize:vertical}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px;min-width:0}
+legend{font-size:14px;font-weight:600;padding:0;margin-bottom:6px}
+.checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:6px}
+.checks label{display:flex;gap:8px;align-items:flex-start;font-size:14px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);cursor:pointer}
+.checks label:hover{background:var(--surface-2)}
+.checks input{margin-top:3px;flex:none}
+
+.grp{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}
+.gbtn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:12px;text-align:left;cursor:pointer;display:grid;gap:2px;align-content:start}
+.gbtn:hover{background:var(--surface-2)}
+.gbtn b{font-size:17px}
+.gbtn span{font-size:13px;color:var(--muted)}
+.gbtn[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+
+.defs{display:grid;gap:10px}
+.def{border-top:1px solid var(--line);padding-top:10px;display:grid;gap:4px}
+.def:first-child{border-top:0;padding-top:0}
+.def-h{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.def-h b{font-size:16px}
+.def p{font-size:14px;color:var(--muted)}
+.sub{display:grid;gap:8px;margin-top:4px;padding-left:12px;border-left:3px solid var(--accent-soft)}
+.sub-i{display:grid;gap:2px}
+.sub-i b{font-size:14px}
+
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:600;font-size:14px}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn[disabled]{opacity:.45;cursor:not-allowed;filter:none}
+.btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(138px,1fr));gap:8px}
+.kpi{position:relative;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:10px 12px;min-height:64px;cursor:pointer;display:grid;gap:2px;align-content:start}
+.kpi:hover{background:var(--surface-2)}
+.kpi b{font-size:17px}
+.kpi span{font-size:12px;color:var(--muted)}
+.kpi[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);cursor:default}
+.kpi .rk{position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-size:13px;font-weight:700}
+.order{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.order .o{background:var(--surface-2);border-radius:99px;padding:3px 10px;font-size:14px}
+.order .o i{font-style:normal;color:var(--muted);margin-right:4px}
+
+.howto{background:var(--surface-2);border-radius:8px;padding:12px 14px;display:grid;gap:6px;font-size:14px}
+.howto h3{font-size:15px;margin:0}
+.ca{color:var(--ca);font-weight:700}
+.cb{color:var(--cb);font-weight:700}
+.ostrip{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line);padding:8px 0;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
+.ostrip .o{background:var(--surface-2);border-radius:99px;padding:2px 10px;font-size:14px;color:var(--ink)}
+.ostrip .o i{font-style:normal;color:var(--muted);margin-right:4px}
+.pair-tags{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:stretch}
+.vs{align-self:center;font-size:13px;color:var(--muted);font-weight:600}
+.tag{border-radius:8px;border-left:6px solid var(--line);padding:8px 10px;display:grid;gap:1px;align-content:start;min-width:0}
+.tag.a{border-left-color:var(--ca-bar);background:var(--ca-soft)}
+.tag.b{border-left-color:var(--cb-bar);background:var(--cb-soft)}
+.tag-r{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.tag.a .tag-r{color:var(--ca)}
+.tag.b .tag-r{color:var(--cb)}
+.tag b{font-size:17px}
+.tag small{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.key{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;font-size:13px;color:var(--muted)}
+.sw{display:inline-block;width:22px;height:8px;border-radius:4px;margin-right:6px;vertical-align:middle}
+.sw.a{background:var(--ca-bar)}
+.sw.b{background:var(--cb-bar);width:8px}
+.bars{display:grid;gap:3px;width:100%}
+.bars i{display:block;height:9px;border-radius:5px}
+.bars .ba{background:var(--ca-bar)}
+.bars .bb{background:var(--cb-bar);width:20%}
+.bars .see{display:block;width:100%;max-width:104px;height:auto;margin-inline:auto;color:var(--muted)}
+.bars .see .da{fill:var(--ca-bar)}
+.bars .see .db{fill:var(--cb-bar)}
+.key.dots .sw{width:12px;height:12px;border-radius:50%}
+.opt[aria-disabled="true"] .bars .see circle{fill:var(--off)}
+.picked{font-size:14px;background:var(--surface-2);border-radius:6px;padding:6px 10px}
+.intro{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:14px 16px;display:grid;gap:8px;max-width:72ch}
+.intro p,.intro ul{margin:0}.intro ul{padding-left:20px;display:grid;gap:2px}
+.consent label{align-items:flex-start}
+textarea.obs{font-family:var(--font);font-size:15px;line-height:1.5;white-space:pre-wrap;resize:vertical}
+.obs-n{font-weight:400}
+.obs-n.full{color:var(--warn);font-weight:600}
+.pair{padding-block:12px;border-top:1px solid var(--line);display:grid;gap:8px}
+.pair:first-of-type{border-top:0}
+.pair-q{font-size:16px;font-weight:600}
+.opts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.opt{border:2px solid var(--line);background:var(--surface);border-radius:8px;min-height:88px;padding:10px 8px;cursor:pointer;display:grid;grid-template-areas:"bars" "lab" "num";align-content:center;justify-items:center;gap:6px;line-height:1.15}
+.opt .bars{grid-area:bars}
+.opt .lab{grid-area:lab;font-size:13px;font-weight:600;text-align:center}
+.opt .num{grid-area:num;font-size:12px;color:var(--muted)}
+.opt:hover{background:var(--surface-2)}
+.opt[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent)}
+.opt[aria-disabled="true"]{border-style:dashed;background:transparent;color:var(--off);cursor:not-allowed}
+.opt[aria-disabled="true"] .bars i{background:var(--off)}
+.opt[aria-disabled="true"] .num,.opt[aria-disabled="true"] .lab{color:var(--off)}
+.opt[aria-disabled="true"] .num{text-decoration:line-through}
+.opt.only{box-shadow:0 0 0 2px var(--accent) inset}
+@media (max-width:520px){
+  .opts{grid-template-columns:1fr}
+  .opt{grid-template-areas:"num bars lab";grid-template-columns:28px minmax(0,1fr) 112px;min-height:50px;padding:8px 10px;justify-items:stretch;align-items:center;gap:10px}
+  .opt .lab{text-align:left;font-size:14px}
+  .opt .bars .see{max-width:84px;margin-inline:0}
+  .opt .num{font-size:18px;font-weight:700;color:var(--ink)}
+  .tag b{font-size:16px}
+}
+.why{font-size:14px;color:var(--warn);background:var(--warn-soft);padding:8px 10px;border-radius:6px}
+.only-note{font-size:13px;color:var(--muted)}
+.notice{font-size:14px;background:var(--warn-soft);color:var(--warn);padding:8px 12px;border-radius:8px}
+.confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--warn-soft);color:var(--warn);padding:8px 12px;border-radius:8px;font-size:14px}
+.part{display:grid;gap:2px;padding-top:4px}
+.part p{font-size:14px;color:var(--muted)}
+
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.scroll{overflow-x:auto}
+.pass{color:var(--ok);font-weight:700}
+.fail{color:var(--bad);font-weight:700}
+.banner{padding:10px 12px;border-radius:8px;font-size:14px}
+.banner.ok{background:var(--ok-soft);color:var(--ok)}
+.banner.bad{background:var(--bad-soft);color:var(--bad)}
+
+details.setup{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:0}
+details.setup>summary{cursor:pointer;padding:12px 16px;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+details.setup>summary::-webkit-details-marker{display:none}
+details.setup>summary span{font-weight:400;color:var(--muted);font-size:14px}
+.setup-body{padding:4px 16px 16px;display:grid;gap:14px;border-top:1px solid var(--line)}
+.radio{display:flex;gap:16px;flex-wrap:wrap;font-size:14px}
+.radio label{display:flex;gap:6px;align-items:center}
+@media (prefers-reduced-motion:no-preference){.opt,.kpi,.btn,.gbtn{transition:background .12s,border-color .12s}}
+</style>
+</head>
+<body>
+
+<script>
+/* ============================== EDIT HERE ==============================
+   1. KPI_CONFIG   : connection to Google Sheets and form behaviour.
+        sheetUrl   : Web app URL from Google Apps Script (ends in /exec). '' runs the form without Google Sheets.
+        sheetKey   : the same key as KEY in the Apps Script.
+        mode       : 'guided' (only consistent numbers can be picked) or 'free'.
+        tol        : 0, 1 or 2 (product tolerance).
+        tabSuffix  : added to the tab name in the sheet, one entry per KPI group. Change the entry (for example ' v4')
+                     whenever the KPIs of that group change, so new rows go to a fresh tab with the right headers.
+   2. PROFILE_OPTS : the choices shown in the "About you" step.
+   3. KPI_DATA     : the KPIs of each group. 3 to 7 KPIs per group. Order here = column order in the sheet.
+                     code = short name used on buttons and in the sheet, name = full name, def = what it measures,
+                     theme = the group the KPI belongs to.
+                     parts (optional) = components of a combined KPI: [{label,name,def},...], shown under the KPI.
+   ====================================================================== */
+window.KPI_CONFIG={
+  page:'sp',        /* 'buyer' = buyer form, 'sp' = seller and service provider form, 'all' = test build with every route */
+  sheetUrl:'https://script.google.com/macros/s/AKfycbxdt5is8X7Xq5QPaN4wy66yTr9Z9tMcWjvmDdwZOoERMcb5zc7oPLPGGxfA-abrF-ey/exec',
+  sheetKey:'GeMIITD#2026',
+  mode:'guided',
+  tol:1,
+  look:'seesaw',
+  useCodes:false,   // true = respondents type the personal access code sent to them (the script checks it against its Codes tab)
+  tabSuffix:{'Seller':' v5','Service provider':' v5','Buyer':' v5'}
+};
+
+window.PROFILE_OPTS={
+  orgTypes:[
+    "Central Government (Ministry / Department)",
+    "State Government (Department)",
+    "CPSE (Central Public Sector Enterprise)",
+    "State PSU",
+    "Panchayat / Rural local body",
+    "Urban local body / Municipality",
+    "Autonomous body / University / Institute",
+    "Defence / Paramilitary",
+    "Other"
+  ],
+  experience:[
+    "Less than 1 year",
+    "1 to 3 years",
+    "3 to 5 years",
+    "More than 5 years"
+  ],
+  goods:[
+    "IT hardware and electronics",
+    "Furniture",
+    "Office and stationery supplies",
+    "Vehicles and transport",
+    "Medical and healthcare",
+    "Machinery and equipment",
+    "Construction, civil and electrical",
+    "Textiles and uniforms",
+    "Food and consumables",
+    "Other goods"
+  ],
+  services:[
+    "Manpower outsourcing",
+    "Security services",
+    "Housekeeping and facility management",
+    "Vehicle and cab hire",
+    "IT and software services",
+    "Consulting and professional services",
+    "Other services"
+  ],
+  sellerTypes:[
+    "OEM",
+    "MSME",
+    "Startup",
+    "Women-owned",
+    "SC/ST-owned",
+    "None of these"
+  ]
+};
+
+window.KPI_DATA={
+  "Seller":[
+    {code:"DRI",name:"Delivery Reliability Index",theme:"Delivery Reliability",
+     def:"Does the seller deliver on the dates promised in the order? Late or repeatedly late deliveries lower the score."},
+    {code:"SOCR",name:"Seller Order Cancellation Rate",theme:"Contractual Reliability",
+     def:"Out of all completed orders, how many were cancelled because of the seller."},
+    {code:"PQP",name:"Product Quality Performance",theme:"Product Quality",
+     def:"How good the seller’s products are, based on orders rejected or cancelled for quality reasons."},
+    {code:"WAI",name:"Warranty Adherence Index",theme:"Post-sale / Warranty Assurance",
+     def:"Does the seller honour the warranty? It looks at how quickly the seller responds to a claim and fixes the problem."},
+    {code:"SOR",name:"Sahay Overdue Rate",theme:"Financial Discipline",
+     def:"Out of all GeM Sahay loans taken by the seller, how many are overdue (not repaid on time)."}
+  ],
+  "Buyer":[
+    {code:"BPI",name:"Buyer Payment Index",theme:"Payment Reliability & Financial Discipline",
+     def:"Does the buyer pay the seller on time as agreed? Late or repeatedly late payments lower the score."},
+    {code:"BAR",name:"Bid Adherence Rate",theme:"Procurement Discipline",
+     def:"Out of the bids a buyer publishes, how many end in an order, and out of those orders, how many are issued within the initial bid offer validity.",
+     parts:[
+       {label:"Component 1",name:"Bid Fulfilment Rate",def:"Out of the published bids, how many end in an order. No order, and no extension of the bid offer validity requested within 6 months after expiry, scores zero."},
+       {label:"Component 2",name:"Bid Order Timeliness",def:"Out of the orders issued, how many are within the initial bid offer validity. Late orders lower the score."}
+     ]},
+    {code:"CBPR",name:"Category Bid Preference Rate",theme:"Procurement Standardisation & Efficiency",
+     def:"Out of all the buyer’s purchases, how many are made through category bidding (standard category bids) rather than custom bidding."},
+    {code:"BOCR",name:"Buyer Order Cancellation Rate",theme:"Contract Management & Contractual Reliability",
+     def:"Out of all completed orders, how many were cancelled because of the buyer."}
+  ],
+  "Service provider":[
+    {code:"SCR",name:"Service Compliance Rate",theme:"Service quality & compliance",
+     def:"Does the service provider deliver the service as per the contract in every billing period? Deductions for poor or missed service lower the score."},
+    {code:"OSIR",name:"On-Time Service Initiation Rate",theme:"Timely Service Delivery",
+     def:"Out of all contracts, how many did the service provider start on or before the agreed start date."},
+    {code:"OIGR",name:"On-Time Invoice Generation Rate",theme:"Billing & Payment Compliance",
+     def:"Out of all invoices, how many were raised on time, within 15 days of the agreed due date."},
+    {code:"SPCCS",name:"Service Provider Contract Cancellation Score",theme:"Contractual reliability",
+     def:"How many contracts the service provider completes. Contracts cancelled because of the service provider lower the score."},
+    {code:"SOR",name:"Sahay Overdue Rate",theme:"Financial Discipline",
+     def:"Out of all GeM Sahay loans taken by the service provider, how many are overdue (not repaid on time)."}
+  ]
+};
+/* HI:BEGIN  Hindi text for the form. Keys are the exact English strings shown by the form. Edit the values to change the Hindi. */
+window.HI_UI={
+"Buyer":"क्रेता",
+"Seller":"विक्रेता",
+"Service provider":"सेवा प्रदाता",
+"buyers":"क्रेताओं",
+"sellers":"विक्रेताओं",
+"service providers":"सेवा प्रदाताओं",
+"Done":"पूरा",
+"To do":"बाकी",
+"Locked":"बंद",
+"Passed":"पास",
+"Needs a look":"देखना ज़रूरी",
+"Select…":"चुनिए…",
+"Buyers rate the Seller and Service provider KPIs. Sellers and service providers rate the Buyer KPIs.":"क्रेता, विक्रेता और सेवा प्रदाता के KPI की रेटिंग करते हैं। विक्रेता और सेवा प्रदाता, क्रेता के KPI की रेटिंग करते हैं।",
+"You will rate the Seller KPIs, the Service provider KPIs or both, depending on what you buy.":"आप जो खरीदते हैं उसके अनुसार आप विक्रेता के KPI, सेवा प्रदाता के KPI, या दोनों की रेटिंग करेंगे।",
+"You will fill one form: the Buyer KPIs.":"आप एक फ़ॉर्म भरेंगे: क्रेता के KPI।",
+"Your GeM Buyer ID":"आपकी GeM क्रेता ID",
+"Your GeM Seller ID":"आपकी GeM विक्रेता ID",
+"Your GeM Service Provider ID":"आपकी GeM सेवा प्रदाता ID",
+"Experience on GeM":"GeM पर अनुभव",
+"What do you buy on GeM?":"आप GeM पर क्या खरीदते हैं?",
+"Products only":"केवल उत्पाद",
+"Services only":"केवल सेवाएँ",
+"Both products and services":"उत्पाद और सेवाएँ दोनों",
+"Products only: you rate the Seller KPIs. Services only: you rate the Service provider KPIs. Both: you fill two forms, the Seller KPIs first and then the Service provider KPIs.":"केवल उत्पाद: आप विक्रेता के KPI की रेटिंग करेंगे। केवल सेवाएँ: आप सेवा प्रदाता के KPI की रेटिंग करेंगे। दोनों: आप दो फ़ॉर्म भरेंगे, पहले विक्रेता के KPI और फिर सेवा प्रदाता के KPI।",
+"Which services do you mainly provide on GeM? Tick all that apply.":"आप GeM पर मुख्य रूप से कौन-सी सेवाएँ देते हैं? जो लागू हों सभी पर निशान लगाइए।",
+"Seller type. Tick all that apply.":"विक्रेता का प्रकार। जो लागू हों सभी पर निशान लगाइए।",
+"Service provider type. Tick all that apply.":"सेवा प्रदाता का प्रकार। जो लागू हों सभी पर निशान लगाइए।",
+"your GeM ID":"आपकी GeM ID",
+"what you buy on GeM (products, services or both)":"आप GeM पर क्या खरीदते हैं (उत्पाद, सेवाएँ या दोनों)",
+"experience on GeM":"GeM पर अनुभव",
+"products or services":"उत्पाद या सेवाएँ",
+"seller type":"विक्रेता का प्रकार",
+"service provider type":"सेवा प्रदाता का प्रकार",
+"Form {i} of {n}: ":"फ़ॉर्म {i} / {n}: ",
+"Tap the most important KPI first, then the next, until all {n} are numbered. If two feel equal, put either one first. You can show that later with an equal number.":"सबसे ज़रूरी KPI पर पहले टैप कीजिए, फिर अगले पर, जब तक सभी {n} को संख्या न मिल जाए। अगर दो KPI बराबर लगें, तो किसी को भी पहले रखिए। यह बात आप बाद में बराबर संख्या देकर दिखा सकते हैं।",
+"Your order":"आपका क्रम",
+"Undo last":"पिछला हटाइए",
+"Change ranking":"क्रम बदलिए",
+"Changing the ranking clears your comparisons.":"क्रम बदलने पर आपकी तुलनाएँ हट जाएँगी।",
+"Clear and re-rank":"हटाइए और फिर से क्रम दीजिए",
+"Keep":"रहने दीजिए",
+"Finish the ranking first.":"पहले क्रम पूरा कीजिए।",
+"Each question compares two KPIs from your own ranking. Think of a see-saw. The <span class=\"ca\">teal disc</span> on the left is the KPI you ranked higher. The <span class=\"cb\">amber disc</span> on the right is the KPI you ranked lower. The lower the left side drops, the more the higher-ranked KPI matters to you. A level see-saw means both matter the same. There is no right or wrong answer.":"हर प्रश्न में आपके अपने क्रम के दो KPI की तुलना होती है। इसे एक झूले (see-saw) की तरह सोचिए। बाईं ओर की <span class=\"ca\">हरी-नीली (teal) गोली</span> वह KPI है जिसे आपने ऊपर रखा। दाईं ओर की <span class=\"cb\">पीली-नारंगी (amber) गोली</span> वह KPI है जिसे आपने नीचे रखा। बायाँ सिरा जितना नीचे झुकता है, ऊपर रखा KPI आपके लिए उतना ही ज़्यादा ज़रूरी है। झूला बराबर हो तो दोनों समान ज़रूरी हैं। इसमें कोई उत्तर सही या गलत नहीं है।",
+"Each question compares two KPIs from your own ranking. The <span class=\"ca\">teal bar</span> is the KPI you ranked higher. The <span class=\"cb\">amber bar</span> is the KPI you ranked lower and it stays the same. The longer the teal bar, the more the higher-ranked KPI matters to you. There is no right or wrong answer.":"हर प्रश्न में आपके अपने क्रम के दो KPI की तुलना होती है। <span class=\"ca\">हरी-नीली (teal) पट्टी</span> वह KPI है जिसे आपने ऊपर रखा। <span class=\"cb\">पीली-नारंगी (amber) पट्टी</span> वह KPI है जिसे आपने नीचे रखा, और वह वही रहती है। हरी-नीली पट्टी जितनी लंबी होगी, ऊपर रखा KPI आपके लिए उतना ही ज़्यादा ज़रूरी है। इसमें कोई उत्तर सही या गलत नहीं है।",
+"First compare your top KPI, <b>{a}</b>, with your lowest KPI, <b>{b}</b>. This is the biggest difference on the form, so no other answer can be larger than it.":"पहले अपने सबसे ऊपर के KPI, <b>{a}</b>, की तुलना अपने सबसे नीचे के KPI, <b>{b}</b>, से कीजिए। फ़ॉर्म में यही सबसे बड़ा अंतर है, इसलिए कोई और उत्तर इससे बड़ा नहीं हो सकता।",
+"Greyed-out numbers would contradict your earlier answers. Tap one to see why.":"धूसर (grey) संख्याएँ आपके पिछले उत्तरों से मेल नहीं खाएँगी। कारण जानने के लिए उन पर टैप कीजिए।",
+"Free mode: any number can be chosen. Problems are listed at the end.":"फ़्री मोड: कोई भी संख्या चुनी जा सकती है। समस्याएँ अंत में दिखाई जाएँगी।",
+"Going down this list, each KPI is less important, so the number stays the same or goes up.":"इस सूची में नीचे जाते हुए हर KPI कम ज़रूरी होता है, इसलिए संख्या वही रहती है या बढ़ती है।",
+"Going down this list, each KPI is less important, so the number stays the same or goes down.":"इस सूची में नीचे जाते हुए हर KPI कम ज़रूरी होता है, इसलिए संख्या वही रहती है या घटती है।",
+"Your ranking:":"आपका क्रम:",
+"vs":"बनाम",
+"Your #{r}":"आपका #{r}",
+"Your last (#{r})":"आपका आख़िरी (#{r})",
+"How much more does {a} matter than {b}?":"{a}, {b} की तुलना में कितना ज़्यादा ज़रूरी है?",
+"{a} is the left side: the lower it drops, the more it matters":"{a} बायाँ सिरा है: यह जितना नीचे झुकता है, यह उतना ज़्यादा ज़रूरी है",
+"{b} is the right side":"{b} दायाँ सिरा है",
+"{a}: the longer the bar, the more it matters":"{a}: पट्टी जितनी लंबी, उतना ज़्यादा ज़रूरी",
+"{b}: stays the same":"{b}: वही रहता है",
+"Same":"बराबर",
+"A little more":"थोड़ा ज़्यादा",
+"Clearly more":"साफ़ तौर पर ज़्यादा",
+"Much more":"बहुत ज़्यादा",
+"Far more":"कहीं ज़्यादा",
+"number":"संख्या",
+"not available":"उपलब्ध नहीं",
+"Only {n} fits your other answers.":"आपके बाकी उत्तरों के साथ केवल {n} मेल खाता है।",
+"You chose: {a} matters the same as {b}.":"आपने चुना: {a} और {b} बराबर ज़रूरी हैं।",
+"You chose: {a} matters a little more than {b}.":"आपने चुना: {a}, {b} से थोड़ा ज़्यादा ज़रूरी है।",
+"You chose: {a} matters clearly more than {b}.":"आपने चुना: {a}, {b} से साफ़ तौर पर ज़्यादा ज़रूरी है।",
+"You chose: {a} matters much more than {b}.":"आपने चुना: {a}, {b} से बहुत ज़्यादा ज़रूरी है।",
+"You chose: {a} matters far more than {b}.":"आपने चुना: {a}, {b} से कहीं ज़्यादा ज़रूरी है।",
+"{v} is higher than your Best vs Worst answer ({A}). No answer can be higher than that.":"{v}, आपके \"सबसे ज़रूरी बनाम सबसे कम ज़रूरी\" उत्तर ({A}) से बड़ा है। कोई भी उत्तर उससे बड़ा नहीं हो सकता।",
+"Order rule: numbers in this list stay the same or go up from top to bottom.":"क्रम का नियम: इस सूची में ऊपर से नीचे जाते हुए संख्याएँ वही रहती हैं या बढ़ती हैं।",
+"Order rule: numbers in this list stay the same or go down from top to bottom.":"क्रम का नियम: इस सूची में ऊपर से नीचे जाते हुए संख्याएँ वही रहती हैं या घटती हैं।",
+"Product check: with your other answers, {v} would make them contradict each other. A KPI’s two numbers multiplied should be {lo} to {hi}.":"गुणनफल की जाँच: आपके बाकी उत्तरों के साथ {v} चुनने पर उत्तर आपस में टकराएँगे। किसी KPI की दोनों संख्याओं का गुणनफल {lo} से {hi} के बीच होना चाहिए।",
+"{v} does not fit the order rule and the product check together with your other answers.":"आपके बाकी उत्तरों के साथ {v}, क्रम के नियम और गुणनफल की जाँच, दोनों पर खरा नहीं उतरता।",
+"Your Best vs Worst answer changed, so the other comparisons were cleared.":"आपका \"सबसे ज़रूरी बनाम सबसे कम ज़रूरी\" उत्तर बदल गया, इसलिए बाकी तुलनाएँ हट गईं।",
+"Your Best vs Worst answer changed, so the other comparisons were cleared. Please answer them again.":"आपका \"सबसे ज़रूरी बनाम सबसे कम ज़रूरी\" उत्तर बदल गया, इसलिए बाकी तुलनाएँ हट गईं। कृपया उन्हें फिर से भरिए।",
+"Cleared {n} later answer that no longer fit: {list}. Please answer again.":"{n} बाद का उत्तर हट गया क्योंकि वह अब मेल नहीं खाता: {list}। कृपया फिर से भरिए।",
+"Cleared {n} later answers that no longer fit: {list}. Please answer again.":"{n} बाद के उत्तर हट गए क्योंकि वे अब मेल नहीं खाते: {list}। कृपया फिर से भरिए।",
+"Next: form {i} of {n}, the {t} KPIs. Your details are kept.":"अगला: फ़ॉर्म {i} / {n}, {t} के KPI। आपकी जानकारी सुरक्षित है।",
+"Continue to form {i}":"फ़ॉर्म {i} पर जाइए",
+"Complete the steps above to see the checks.":"जाँच देखने के लिए ऊपर के चरण पूरे कीजिए।",
+"Check":"जाँच",
+"Result":"परिणाम",
+"Pass":"पास",
+"Fail":"फ़ेल",
+"Top list: numbers stay the same or go up":"ऊपर की सूची: संख्याएँ वही रहती हैं या बढ़ती हैं",
+"Bottom list: numbers stay the same or go down":"नीचे की सूची: संख्याएँ वही रहती हैं या घटती हैं",
+"No number is higher than the Best vs Worst answer ({A})":"कोई संख्या \"सबसे ज़रूरी बनाम सबसे कम ज़रूरी\" उत्तर ({A}) से बड़ी नहीं है",
+"{k}: {x} × {y} = {p} (should be {lo} to {hi})":"{k}: {x} × {y} = {p} ({lo} से {hi} के बीच होना चाहिए)",
+"All checks pass.":"सभी जाँचें पास हैं।",
+"Some checks fail. Ask the respondent whether to revise, or save as given and note it.":"कुछ जाँचें फ़ेल हैं। उत्तरदाता से पूछिए कि उत्तर बदलना है या जैसा है वैसा सहेजना है।",
+"These are example answers and cannot be saved.":"ये नमूना उत्तर हैं और सहेजे नहीं जा सकते।",
+"Clear form":"फ़ॉर्म साफ़ कीजिए",
+"Form {i} of {n} recorded.":"फ़ॉर्म {i} / {n} दर्ज हो गया।",
+"Thank you. Your response has been recorded.":"धन्यवाद। आपका उत्तर दर्ज कर लिया गया है।",
+"Thank you. Your response was sent.":"धन्यवाद। आपका उत्तर भेज दिया गया है।",
+"Your answers could not be sent yet. They are kept on this device and will be sent when the connection returns. Keep this page open, or press Try again.":"आपके उत्तर अभी नहीं भेजे जा सके। वे इस डिवाइस पर सुरक्षित हैं और कनेक्शन वापस आने पर भेज दिए जाएँगे। इस पेज को खुला रखिए, या “फिर से कोशिश कीजिए” दबाइए।",
+"Try again":"फिर से कोशिश कीजिए",
+"{n} / {max} words":"{n} / {max} शब्द",
+"(limit reached)":"(सीमा पूरी)",
+"A response with ID \"{id}\" is already saved for these KPIs on this device. Check the ID before saving again.":"इन KPI के लिए ID \"{id}\" वाला उत्तर इस डिवाइस पर पहले से सहेजा हुआ है। दोबारा सहेजने से पहले ID जाँच लीजिए।",
+"Access code (sent to you by GeM)":"एक्सेस कोड (GeM द्वारा आपको भेजा गया)",
+"access code":"एक्सेस कोड",
+"This consultation has closed. Your response could not be accepted.":"यह परामर्श बंद हो चुका है। आपका उत्तर स्वीकार नहीं किया जा सका।",
+"Your response could not be accepted. Please contact the IIT Delhi team.":"आपका उत्तर स्वीकार नहीं किया जा सका। कृपया IIT दिल्ली की टीम से संपर्क कीजिए।",
+"organisation":"संगठन",
+"organisation type":"संगठन का प्रकार",
+"Organisation":"संगठन",
+"Type of organisation":"संगठन का प्रकार",
+"How to compare":"तुलना कैसे करें",
+"Your top KPI compared with each of the others":"आपका सबसे ऊपर का KPI, बाकी हर KPI की तुलना में",
+"Each of the others compared with your lowest KPI":"बाकी हर KPI, आपके सबसे नीचे के KPI की तुलना में",
+"Any other products or services (optional)":"अन्य उत्पाद या सेवाएँ (वैकल्पिक)",
+"Rank the KPIs by importance":"KPI को महत्व के क्रम में रखिए",
+"Compare your top and lowest KPI":"अपने सबसे ऊपर और सबसे नीचे के KPI की तुलना कीजिए",
+"Compare the remaining KPIs":"बाकी KPI की तुलना कीजिए",
+"Review your answers":"अपने उत्तर जाँचिए",
+"Your details":"आपकी जानकारी",
+"Your role on GeM":"GeM पर आपकी भूमिका",
+"Submit response":"उत्तर जमा कीजिए",
+"Submitting…":"जमा हो रहा है…",
+"Submit another response":"एक और उत्तर जमा कीजिए",
+"Answer step {n} first.":"पहले चरण {n} का उत्तर दीजिए।",
+"Any other comment (optional, up to {max} words)":"कोई अन्य टिप्पणी (वैकल्पिक, अधिकतम {max} शब्द)",
+"Any other point about the KPIs or the rating system that you would like to share.":"KPI या रेटिंग प्रणाली के बारे में कोई अन्य बात जो आप साझा करना चाहें।",
+"KPIs used to rate {who}":"{who} की रेटिंग के KPI",
+"You are rating the {t} KPIs ({n} in total). Read what each one measures, then rank them in the next step.":"आप {t} के KPI की रेटिंग कर रहे हैं (कुल {n})। हर KPI क्या मापता है, यह पढ़िए, फिर अगले चरण में उन्हें क्रम दीजिए।",
+"Stakeholder Consultation":"हितधारक परामर्श",
+"Years of experience on GeM":"GeM पर अनुभव (वर्ष)",
+"GeM 2.0 Rating Framework":"GeM 2.0 रेटिंग फ्रेमवर्क",
+"This form is part of that study. Based on your experience on GeM, you will:":"यह फ़ॉर्म इसी अध्ययन का हिस्सा है। GeM पर अपने अनुभव के आधार पर आप:",
+"rank the performance measures (KPIs) and tell us how much more one matters than another":"KPI (काम को परखने के पैमाने) को क्रम में रखेंगे और बताएँगे कि एक KPI दूसरे से कितना ज़्यादा ज़रूरी है",
+"tell us about any important aspect or KPI we have missed":"कोई ज़रूरी बात या KPI जो हमसे छूट गई हो, वह बताएँगे",
+"Your responses are collected for this research study only. They are analysed together with those of other stakeholders and reported in combined form. Your GeM ID is used only to avoid duplicate entries.":"आपके उत्तर केवल इस शोध अध्ययन के लिए एकत्र किए जा रहे हैं। उनका विश्लेषण अन्य हितधारकों के उत्तरों के साथ किया जाएगा और परिणाम सम्मिलित रूप में प्रस्तुत किए जाएँगे। आपकी GeM ID का उपयोग केवल दोहरी प्रविष्टि से बचने के लिए किया जाता है।",
+"Time needed: about 10 minutes.":"समय: लगभग 10 मिनट।",
+"Please select the role in which you transact on GeM.":"कृपया वह भूमिका चुनिए जिसमें आप GeM पर लेन-देन करते हैं।",
+"Seller (supplies products)":"विक्रेता (उत्पादों की आपूर्ति करते हैं)",
+"Service provider (supplies services)":"सेवा प्रदाता (सेवाएँ देते हैं)",
+"Both seller and service provider":"विक्रेता और सेवा प्रदाता, दोनों",
+"Sellers and service providers rate the Buyer KPIs. You will fill one form.":"विक्रेता और सेवा प्रदाता, क्रेता के KPI की रेटिंग करते हैं। आप एक फ़ॉर्म भरेंगे।",
+"Your GeM Seller / Service Provider ID":"आपकी GeM विक्रेता / सेवा प्रदाता ID",
+"Which products do you mainly buy on GeM? Tick all that apply.":"आप GeM पर मुख्य रूप से कौन-से उत्पाद खरीदते हैं? जो लागू हों सभी पर निशान लगाइए।",
+"Which services do you mainly buy on GeM? Tick all that apply.":"आप GeM पर मुख्य रूप से कौन-सी सेवाएँ खरीदते हैं? जो लागू हों सभी पर निशान लगाइए।",
+"Which products do you mainly supply on GeM? Tick all that apply.":"आप GeM पर मुख्य रूप से कौन-से उत्पादों की आपूर्ति करते हैं? जो लागू हों सभी पर निशान लगाइए।",
+"Business type. Tick all that apply.":"व्यवसाय का प्रकार। जो लागू हों सभी पर निशान लगाइए।",
+"business type":"व्यवसाय का प्रकार",
+"Missing KPIs and comments":"छूटे हुए KPI और टिप्पणी",
+"Optional":"वैकल्पिक",
+"Please tell us if an important aspect is missing from the {t} KPIs. This is one of the main aims of this consultation.":"कृपया बताइए कि {t} के KPI में कोई ज़रूरी पहलू छूट गया है या नहीं। इस परामर्श का यह एक मुख्य उद्देश्य है।",
+"Any KPI we have missed? (optional, up to {max} words)":"क्या कोई KPI छूट गया है? (वैकल्पिक, अधिकतम {max} शब्द)",
+"Name the KPI and tell us briefly why it matters.":"KPI का नाम लिखिए और संक्षेप में बताइए कि वह क्यों ज़रूरी है।",
+"Consent and submission":"सहमति और जमा करना",
+"Complete the steps above first.":"पहले ऊपर के चरण पूरे कीजिए।",
+"I agree to take part in this study. I understand that my responses, including my GeM ID, will be used only for this study by IIT Delhi and GeM and reported in combined form.":"मैं इस अध्ययन में भाग लेने के लिए सहमत हूँ। मैं समझता/समझती हूँ कि मेरी GeM ID सहित मेरे उत्तर केवल इस अध्ययन के लिए IIT दिल्ली और GeM द्वारा उपयोग किए जाएँगे और सम्मिलित रूप में प्रस्तुत किए जाएँगे।",
+"Please tick the consent box to submit your response.":"उत्तर जमा करने के लिए कृपया सहमति के बॉक्स पर निशान लगाइए।",
+"Before submitting, please complete \"Your details\": {list}.":"जमा करने से पहले कृपया \"आपकी जानकारी\" पूरी कीजिए: {list}।",
+"The access code does not match your GeM ID. Please check the code you were sent, correct it under \"Your details\" and submit again.":"एक्सेस कोड आपकी GeM ID से मेल नहीं खाता। कृपया आपको भेजा गया कोड जाँचिए, \"आपकी जानकारी\" में सुधारिए और फिर से जमा कीजिए।",
+"Both":"दोनों",
+"GeM and IIT Delhi are jointly building the GeM 2.0 Rating Framework, a fair and transparent rating system for buyers, sellers and service providers.":"GeM और IIT Delhi मिलकर GeM 2.0 Rating Framework बना रहे हैं। यह क्रेताओं, विक्रेताओं और सेवा प्रदाताओं के लिए एक निष्पक्ष और पारदर्शी रेटिंग प्रणाली है।"
+};
+window.OPT_HI={
+ "orgTypes": [
+  "केंद्र सरकार (मंत्रालय / विभाग)",
+  "राज्य सरकार (विभाग)",
+  "CPSE (केंद्रीय सार्वजनिक क्षेत्र का उपक्रम)",
+  "राज्य PSU (सार्वजनिक क्षेत्र का उपक्रम)",
+  "पंचायत / ग्रामीण स्थानीय निकाय",
+  "शहरी स्थानीय निकाय / नगरपालिका",
+  "स्वायत्त निकाय / विश्वविद्यालय / संस्थान",
+  "रक्षा / अर्धसैनिक बल",
+  "अन्य"
+ ],
+ "experience": [
+  "1 वर्ष से कम",
+  "1 से 3 वर्ष",
+  "3 से 5 वर्ष",
+  "5 वर्ष से अधिक"
+ ],
+ "sellerTypes": [
+  "OEM (मूल उपकरण निर्माता)",
+  "MSME (सूक्ष्म, लघु एवं मध्यम उद्यम)",
+  "स्टार्टअप",
+  "महिला-स्वामित्व वाला",
+  "SC/ST-स्वामित्व वाला",
+  "इनमें से कोई नहीं"
+ ],
+ "goods": [
+  "आईटी हार्डवेयर और इलेक्ट्रॉनिक्स",
+  "फ़र्नीचर",
+  "कार्यालय और स्टेशनरी सामग्री",
+  "वाहन और परिवहन",
+  "चिकित्सा और स्वास्थ्य सेवा सामग्री",
+  "मशीनरी और उपकरण",
+  "निर्माण, सिविल और विद्युत",
+  "वस्त्र और वर्दी",
+  "खाद्य और उपभोग्य सामग्री",
+  "अन्य वस्तुएँ"
+ ],
+ "services": [
+  "मानव संसाधन आउटसोर्सिंग",
+  "सुरक्षा सेवाएँ",
+  "हाउसकीपिंग और सुविधा प्रबंधन",
+  "वाहन और कैब किराये पर",
+  "आईटी और सॉफ़्टवेयर सेवाएँ",
+  "परामर्श और पेशेवर सेवाएँ",
+  "अन्य सेवाएँ"
+ ]
+};
+window.KPI_HI={
+ "Seller": {
+  "DRI": {
+   "def": "क्या विक्रेता ऑर्डर में तय तारीख पर सामान पहुँचाता है? देर से या बार-बार देर से डिलीवरी होने पर स्कोर घटता है।"
+  },
+  "SOCR": {
+   "def": "पूरे हो चुके कुल ऑर्डर में से कितने ऑर्डर विक्रेता की वजह से रद्द हुए।"
+  },
+  "PQP": {
+   "def": "विक्रेता के उत्पाद कितने अच्छे हैं, यह गुणवत्ता की वजह से लौटाए या रद्द किए गए ऑर्डर देखकर तय होता है।"
+  },
+  "WAI": {
+   "def": "क्या विक्रेता वारंटी निभाता है? देखा जाता है कि विक्रेता शिकायत पर कितनी जल्दी जवाब देता है और समस्या ठीक करता है।"
+  },
+  "SOR": {
+   "def": "विक्रेता ने GeM Sahay से जितने लोन लिए, उनमें से कितने बकाया हैं (समय पर चुकाए नहीं गए)।"
+  }
+ },
+ "Buyer": {
+  "BPI": {
+   "def": "क्या क्रेता तय समय पर विक्रेता को भुगतान करता है? देर से या बार-बार देर से भुगतान होने पर स्कोर घटता है।"
+  },
+  "BAR": {
+   "def": "क्रेता जितने bids निकालता है, उनमें से कितनों पर ऑर्डर दिया गया, और उन ऑर्डर में से कितने शुरुआती bid offer validity के भीतर दिए गए।",
+   "parts": [
+    {
+     "label": "भाग 1",
+     "def": "निकाले गए bids में से कितनों पर ऑर्डर दिया गया। ऑर्डर नहीं दिया और bid offer validity खत्म होने के 6 महीने के भीतर extension भी नहीं माँगा, तो शून्य अंक।"
+    },
+    {
+     "label": "भाग 2",
+     "def": "दिए गए ऑर्डर में से कितने शुरुआती bid offer validity के भीतर दिए गए। देर से ऑर्डर देने पर स्कोर घटता है।"
+    }
+   ]
+  },
+  "CBPR": {
+   "def": "क्रेता की कुल खरीद में से कितनी खरीद कस्टम बिडिंग की जगह कैटेगरी बिडिंग (category bid) से हुई।"
+  },
+  "BOCR": {
+   "def": "पूरे हो चुके कुल ऑर्डर में से कितने ऑर्डर क्रेता की वजह से रद्द हुए।"
+  }
+ },
+ "Service provider": {
+  "SCR": {
+   "def": "क्या सेवा प्रदाता हर बिलिंग अवधि में अनुबंध के अनुसार सेवा देता है? खराब या छूटी हुई सेवा पर कटौती होने से स्कोर घटता है।"
+  },
+  "OSIR": {
+   "def": "कुल अनुबंधों में से कितनों में सेवा प्रदाता ने तय शुरुआत की तारीख तक या उससे पहले सेवा शुरू की।"
+  },
+  "OIGR": {
+   "def": "कुल बिलों (invoices) में से कितने समय पर, यानी देय तारीख से 15 दिन के भीतर, बनाए गए।"
+  },
+  "SPCCS": {
+   "def": "सेवा प्रदाता कितने अनुबंध पूरे करता है। सेवा प्रदाता की वजह से रद्द हुए अनुबंधों से स्कोर घटता है।"
+  },
+  "SOR": {
+   "def": "सेवा प्रदाता ने GeM Sahay से जितने लोन लिए, उनमें से कितने बकाया हैं (समय पर चुकाए नहीं गए)।"
+  }
+ }
+};
+/* HI:END */
+</script>
+
+<div class="wrap">
+  <header class="head">
+    <div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><div class="eyebrow" id="hEye">Stakeholder Consultation</div><button class="btn" id="langBtn" type="button" lang="hi" style="min-height:36px;padding:4px 14px">हिन्दी</button></div>
+    <h1 id="hTitle">GeM 2.0 Rating Framework</h1>
+    <div class="intro" id="intro"></div>
+  </header>
+
+  <p class="banner bad" id="cfgErr" hidden></p>
+
+  <details class="setup" id="setup">
+    <summary>Facilitator setup <span id="setupSummary"></span></summary>
+    <div class="setup-body">
+      <div>
+        <h3>Check mode</h3>
+        <div class="radio" role="radiogroup" aria-label="Check mode">
+          <label><input type="radio" name="mode" value="guided" id="modeGuided"> Guided: only consistent numbers can be chosen</label>
+          <label><input type="radio" name="mode" value="free" id="modeFree"> Free: any number, problems are reported at the end</label>
+        </div>
+      </div>
+      <label class="f" style="max-width:320px">Product tolerance (plus or minus)
+        <select id="tol"><option value="0">0 (exact products only)</option><option value="1">1 (default)</option><option value="2">2</option></select>
+        <span class="small muted" style="font-weight:400">For each KPI the two numbers multiplied should land within this distance of the Best-vs-Worst answer. The paper sets no tolerance, so this is the study team's choice.</span>
+      </label>
+      <p class="small muted">KPI names, definitions and the choices in the "About you" step are edited in the first script block of this file (KPI_DATA and PROFILE_OPTS).</p>
+      <div class="btns">
+        <button class="btn" id="fillExample" type="button">Fill example answers</button>
+        <button class="btn" id="resetSetup" type="button">Reset setup to defaults</button>
+      </div>
+      <div id="sheetBox" hidden>
+        <div class="btns"><button class="btn" id="sendTest" type="button">Send test row to Google Sheet</button><span class="small muted" id="testNote"></span></div>
+        <p class="small muted" style="margin-top:6px">Writes one row to a tab whose name starts with TEST, for the KPI group currently on screen. Delete that tab afterwards.</p>
+      </div>
+    </div>
+  </details>
+
+  <section class="step" id="s1"></section>
+  <section class="step" id="sP"></section>
+  <section class="step" id="sK"></section>
+  <section class="step" id="s2"></section>
+  <section class="step" id="s3"></section>
+  <section class="step" id="s4"></section>
+  <section class="step" id="s5"></section>
+  <section class="step" id="s7"></section>
+  <section class="step" id="s8"></section>
+
+  <section class="step" id="s6">
+    <div class="step-h"><div class="n" style="background:var(--surface-2);color:var(--muted)">&#8721;</div><h2>Saved responses</h2><span class="chip" id="savedCount">0</span></div>
+    <div id="savedBody"></div>
+  </section>
+</div>
+
+<script>
+(function(){
+'use strict';
+/* LOGIC:BEGIN */
+/* n KPIs give m=n-2 middle KPIs. Cells: 0 = best vs worst (A); 1..m = best vs 2nd..(n-1)th; m+1..2m = 2nd..(n-1)th vs worst. */
+const S=5;
+function asc(len,A){
+  const out=[];
+  (function go(cur,min){
+    if(cur.length===len){out.push(cur.slice());return;}
+    for(let v=min;v<=A;v++){cur.push(v);go(cur,v);cur.pop();}
+  })([],1);
+  return out;
+}
+function buildSets(t,n){
+  const m=n-2,full=[],noDir=[],noProd=[];
+  for(let A=1;A<=S;A++){
+    const ups=asc(m,A),downs=ups.map(function(u){return u.slice().reverse();});
+    for(const u of ups)for(const d of downs){
+      const rec=[A].concat(u,d);
+      noProd.push(rec);
+      let ok=true;for(let k=0;k<m;k++){if(Math.abs(u[k]*d[k]-A)>t){ok=false;break;}}
+      if(ok)full.push(rec);
+    }
+    const pairs=[];
+    for(let x=1;x<=A;x++)for(let y=1;y<=A;y++)if(Math.abs(x*y-A)<=t)pairs.push([x,y]);
+    (function go(k,xs,ys){
+      if(k===m){noDir.push([A].concat(xs,ys));return;}
+      for(const p of pairs){xs.push(p[0]);ys.push(p[1]);go(k+1,xs,ys);xs.pop();ys.pop();}
+    })(0,[],[]);
+  }
+  return {full:full,noDir:noDir,noProd:noProd,n:n,m:m,cells:2*m+1};
+}
+function match(rec,fixed){for(let i=0;i<rec.length;i++){if(fixed[i]!=null&&rec[i]!==fixed[i])return false;}return true;}
+function feasible(sets,vals){return sets.full.some(function(r){return match(r,vals);});}
+function fixedFor(vals,cell){return vals.map(function(v,i){return i===cell?null:(vals[cell]!=null&&i>cell?null:v);});}
+function allowedValues(sets,vals,cell){
+  const fixed=fixedFor(vals,cell),s=new Set();
+  for(const r of sets.full)if(match(r,fixed))s.add(r[cell]);
+  return [...s].sort(function(a,b){return a-b;});
+}
+function reasonFor(sets,vals,cell,v){
+  const A=vals[0];
+  if(cell>0&&A!=null&&v>A)return 'cap';
+  const fixed=fixedFor(vals,cell);fixed[cell]=v;
+  const p=sets.noProd.some(function(r){return match(r,fixed);}),d=sets.noDir.some(function(r){return match(r,fixed);});
+  if(p&&!d)return 'product';
+  if(d&&!p)return 'order';
+  return 'both';
+}
+function repair(sets,vals,cell){
+  const cleared=[];
+  while(!feasible(sets,vals)){
+    let j=-1;for(let i=vals.length-1;i>cell;i--)if(vals[i]!=null){j=i;break;}
+    if(j<0)break;
+    vals[j]=null;cleared.push(j);
+  }
+  return cleared;
+}
+function runChecks(vals,t,n){
+  const m=n-2,A=vals[0],top=vals.slice(1,1+m),bot=vals.slice(1+m);
+  const prod=top.map(function(x,k){const y=bot[k];return {x:x,y:y,p:x*y,lo:A-t,hi:A+t,ok:Math.abs(x*y-A)<=t};});
+  let up=true,low=true;
+  for(let k=1;k<m;k++){if(top[k]<top[k-1])up=false;if(bot[k]>bot[k-1])low=false;}
+  const r={cap:vals.slice(1).every(function(v){return v<=A;}),up:up,low:low,prod:prod};
+  r.ok=r.cap&&r.up&&r.low&&prod.every(function(p){return p.ok;});
+  return r;
+}
+/* LOGIC:END */
+
+const LABEL=['','Same','A little more','Clearly more','Much more','Far more'];
+const PICKT=['','You chose: {a} matters the same as {b}.','You chose: {a} matters a little more than {b}.','You chose: {a} matters clearly more than {b}.','You chose: {a} matters much more than {b}.','You chose: {a} matters far more than {b}.'];
+/* ---------- language (English / Hindi). Saved data stays in English. ---------- */
+const HI_UI=window.HI_UI||{},KPI_HI=window.KPI_HI||{},OPT_HI=window.OPT_HI||{};
+let LANG=(function(){let q='';try{q=new URLSearchParams(location.search).get('lang')||'';}catch(e){}if(!q){try{q=localStorage.getItem('kif.lang')||'';}catch(e){}}return q==='hi'?'hi':'en';})();
+function tr(s){return LANG==='hi'&&HI_UI[s]!=null?HI_UI[s]:s;}
+function fmt(s,v){return String(s).replace(/\{(\w+)\}/g,function(m,k){return v&&v[k]!=null?v[k]:m;});}
+function lab(v){return tr(LABEL[v]);}
+function ol(list,v){const i=(window.PROFILE_OPTS&&window.PROFILE_OPTS[list]||[]).indexOf(v);return LANG==='hi'&&OPT_HI[list]&&OPT_HI[list][i]?OPT_HI[list][i]:v;}
+function barsInner(v){return '<i class="ba" style="width:'+(v*20)+'%"></i><i class="bb"></i>';}
+/* see-saw: level 1 is level, each step tips the left (higher-ranked, teal) side down by 7 degrees */
+function seesawInner(v){
+  const a=(v-1)*7*Math.PI/180,L=36,px=50,py=34,dx=L*Math.cos(a),dy=L*Math.sin(a);
+  const x1=px-dx,y1=py+dy,x2=px+dx,y2=py-dy,r=7,f=function(n){return n.toFixed(1);};
+  return '<svg class="see" viewBox="0 0 100 60" focusable="false"><polygon points="50,34 43,58 57,58" fill="currentColor" opacity=".55"/>'
+    +'<line x1="'+f(x1)+'" y1="'+f(y1)+'" x2="'+f(x2)+'" y2="'+f(y2)+'" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity=".75"/>'
+    +'<circle class="da" cx="'+f(x1)+'" cy="'+f(y1-r)+'" r="'+r+'"/><circle class="db" cx="'+f(x2)+'" cy="'+f(y2-r)+'" r="'+r+'"/></svg>';
+}
+const OBS_MAX=80;
+function obsCountText(n){return fmt(tr('{n} / {max} words'),{n:n,max:OBS_MAX})+(n>=OBS_MAX?' '+tr('(limit reached)'):'');}
+function wordCount(s){const m=String(s||'').match(/\S+/g);return m?m.length:0;}
+function limitWords(s,max){
+  const re=/\S+/g;let m,n=0,end=-1;
+  while((m=re.exec(s))){n++;if(n===max)end=m.index+m[0].length;if(n>max)return s.slice(0,end);}
+  return s;
+}
+const GROUPS=['Buyer','Seller','Service provider'];
+const DEALS=[['products','Products only'],['services','Services only'],['both','Both products and services']];
+const DEALS_LABEL={products:'Products',services:'Services',both:'Both products and services'};
+const NWORD=['','','','three','four','five','six','seven'];
+const ORD={2:'2nd',3:'3rd'};
+function ord(k){return ORD[k]||(k+'th');}
+const $=function(id){return document.getElementById(id);};
+const esc=function(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
+function clean(s){return String(s==null?'':s).replace(/[\t\r\n]+/g,' ').trim();}
+function lsGet(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+/* ---------- configuration ---------- */
+const CFG=window.KPI_CONFIG||{};
+const SHEET_URL=String(CFG.sheetUrl||'').trim();
+const SHEET_KEY=String(CFG.sheetKey||'');
+const LOOK=(function(){let q='';try{q=new URLSearchParams(location.search).get('look')||'';}catch(e){}return (q||CFG.look||'bars')==='seesaw'?'seesaw':'bars';})();
+function visInner(v){return LOOK==='seesaw'?seesawInner(v):barsInner(v);}
+function tabSuffixFor(target){const s=CFG.tabSuffix;if(s&&typeof s==='object')return String(s[target]==null?'':s[target]);return String(s==null?'':s);}
+const OPT=Object.assign({orgTypes:[],experience:[],goods:[],services:[],sellerTypes:[]},window.PROFILE_OPTS||{});
+const KPIS={},CFG_ERR=[];
+GROUPS.forEach(function(g){
+  const a=(window.KPI_DATA||{})[g];
+  if(!Array.isArray(a)||a.length<3||a.length>7||!a.every(function(k){return k&&typeof k.code==='string'&&k.code.trim();})){CFG_ERR.push(g);KPIS[g]=[];return;}
+  KPIS[g]=a.map(function(k){return {code:String(k.code).trim(),name:String(k.name||k.code),def:String(k.def||''),theme:String(k.theme||''),parts:(Array.isArray(k.parts)?k.parts:[]).map(function(p){return {label:String(p.label||''),name:String(p.name||''),def:String(p.def||'')};})};});
+});
+const HASH=(location.hash||'').toLowerCase().replace('#','');
+const RESPONDENT=!!SHEET_URL&&HASH!=='admin';
+/* Links: #day1 = buyers. #day2 = sellers and service providers (they choose which). #buyer, #seller, #provider also work. */
+const PAGE=(['buyer','sp'].indexOf(CFG.page)>=0)?CFG.page:'all';
+const DAY2=HASH==='day2';
+const ROLE_ALL=['Buyer','Seller','Service provider','Both'];
+const ROLES=PAGE==='buyer'?['Buyer']:(PAGE==='sp'||DAY2?['Seller','Service provider','Both']:ROLE_ALL);
+const HASH_GROUP=(function(){
+  if(PAGE==='buyer')return 'Buyer';
+  const g=({day1:'Buyer',seller:'Seller',buyer:'Buyer',provider:'Service provider','service-provider':'Service provider',both:'Both'}[HASH]||null);
+  return g&&ROLES.indexOf(g)>=0?g:null;
+})();
+const ROLE_OUT={'Both':'Both (Seller and Service provider)'};
+const ROLE_LABEL={'Buyer':'Buyer','Seller':'Seller (supplies products)','Service provider':'Service provider (supplies services)','Both':'Both seller and service provider'};
+function SN(k){return k-(HASH_GROUP?1:0);}
+const setup=RESPONDENT?{}:(lsGet('kif.setup.v2')||{});
+
+function blankProfile(){return {id:'',code:'',org:'',orgType:'',deals:'',exp:'',cats:[],catOther:'',types:[]};}
+const state={
+  group:HASH_GROUP||'Seller',chosen:!!HASH_GROUP,tIdx:0,savedT:[],
+  mode:(CFG.mode||setup.mode)==='free'?'free':'guided',
+  tol:[0,1,2].indexOf(CFG.tol)>=0?CFG.tol:([0,1,2].indexOf(setup.tol)>=0?setup.tol:1),
+  profile:blankProfile(),
+  ranking:[],vals:[],
+  obs:'',missing:'',consent:false,notice:'',reason:null,confirm:null,demo:false,justSaved:false,
+  local:Array.isArray(lsGet('kif.saved.v2'))?lsGet('kif.saved.v2'):[],
+  rejectMsg:'',remote:null,db:null,lastRec:null,sheetErr:'',dbErr:'',canWrite:null,saving:false,saveNote:'',viewGroup:'All',uploadNote:''
+};
+/* group = who the respondent is. target = whose KPIs the respondent is rating in the form on screen.
+   Buyer: Seller KPIs and/or Service provider KPIs, depending on what they buy. Seller and Service provider: Buyer KPIs. */
+function targets(){
+  const d=state.profile.deals;
+  if(!state.chosen)return [];
+  if(state.group==='Buyer')return d==='products'?['Seller']:(d==='services'?['Service provider']:(d==='both'?['Seller','Service provider']:[]));
+  return ['Buyer'];
+}
+function T(){return targets()[state.tIdx]||'Seller';}
+function formsReady(){return targets().length>0;}
+function N(){return KPIS[T()].length;}
+function M(){return N()-2;}
+function CELLS(){return 2*N()-3;}
+function blankVals(){return new Array(CELLS()).fill(null);}
+state.vals=blankVals();
+const setCache={};
+function getSets(){const k=state.tol+'/'+N();return setCache[k]||(setCache[k]=buildSets(state.tol,N()));}
+
+let setupChain=Promise.resolve(),setupTimer=null;
+function pushSetup(){
+  if(!state.db||state.canWrite===false)return;
+  clearTimeout(setupTimer);
+  setupTimer=setTimeout(function(){
+    const body={mode:state.mode,tol:state.tol};
+    setupChain=setupChain.then(function(){return state.db.doc('config/setup').set(body);}).catch(function(){});
+  },800);
+}
+function persistSetup(){lsSet('kif.setup.v2',{mode:state.mode,tol:state.tol});pushSetup();}
+function list(){return state.db?(state.remote||[]):state.local;}
+function shown(){return list().filter(function(r){return state.viewGroup==='All'||r.target===state.viewGroup;});}
+function kpi(i){return KPIS[T()][i];}
+function kH(x){const g=KPI_HI[T()];return LANG==='hi'&&g&&g[x.code]?g[x.code]:null;}
+function kName(x){const h=kH(x);return h&&h.name||x.name;}
+function kTheme(x){const h=kH(x);return h&&h.theme||x.theme;}
+function kDef(x){const h=kH(x);return h&&h.def||x.def;}
+function kPart(x,p,i){const h=kH(x),q=h&&h.parts&&h.parts[i];return q?{label:q.label||p.label,name:q.name||p.name,def:q.def||p.def}:p;}
+function name(i){return kpi(i).code;}
+function rankName(r){return name(state.ranking[r]);}
+function rankFull(r){return kpi(state.ranking[r]).name;}
+function rankingDone(){return state.ranking.length===N();}
+function anyAnswers(){return state.vals.some(function(v){return v!=null;});}
+function allAnswers(){return state.vals.every(function(v){return v!=null;});}
+
+/* cells: 0 = rank1 vs last rank; 1..m = rank1 vs rank2..(n-1); m+1..2m = rank2..(n-1) vs last rank */
+function cellPair(cell){
+  const m=M();
+  if(cell===0)return [0,N()-1];
+  if(cell<=m)return [0,cell];
+  return [cell-m,N()-1];
+}
+function allowed(cell){
+  if(state.mode==='free')return [1,2,3,4,5];
+  return allowedValues(getSets(),state.vals,cell);
+}
+function resetAnswers(){state.vals=blankVals();state.reason=null;state.notice='';}
+function clearForm(){state.ranking=[];state.obs='';state.missing='';resetAnswers();state.confirm=null;state.demo=false;state.justSaved=false;state.saveNote='';}
+
+function pick(cell,v){
+  state.justSaved=false;state.saveNote='';
+  const ok=allowed(cell);
+  if(ok.indexOf(v)<0){
+    state.reason={cell:cell,v:v,why:reasonFor(getSets(),state.vals,cell,v)};
+    renderAnswers();return;
+  }
+  state.reason=null;state.notice='';
+  if(state.vals[cell]===v){
+    state.vals[cell]=null;
+    if(cell===0&&anyAnswers()){state.vals=blankVals();state.notice=tr('Your Best vs Worst answer changed, so the other comparisons were cleared.');}
+  }else{
+    const hadOthers=state.vals.some(function(x,i){return i!==cell&&x!=null;});
+    state.vals[cell]=v;
+    if(cell===0){
+      if(hadOthers){state.vals=blankVals();state.vals[0]=v;state.notice=tr('Your Best vs Worst answer changed, so the other comparisons were cleared. Please answer them again.');}
+    }else if(state.mode==='guided'){
+      const cleared=repair(getSets(),state.vals,cell);
+      if(cleared.length){
+        state.notice=fmt(tr(cleared.length>1?'Cleared {n} later answers that no longer fit: {list}. Please answer again.':'Cleared {n} later answer that no longer fit: {list}. Please answer again.'),{n:cleared.length,list:cleared.sort(function(a,b){return a-b;}).map(pairText).join('; ')});
+      }
+    }
+  }
+  renderAnswers();renderReview();
+}
+function pairText(cell){const p=cellPair(cell);return rankName(p[0])+' '+tr('vs')+' '+rankName(p[1]);}
+
+/* ---------- profile ---------- */
+function typeLabel(){return state.group==='Service provider'?'Service provider type':(state.group==='Both'?'Business type':'Seller type');}
+function catSets(){
+  const g=state.group,d=state.profile.deals,buy=g==='Buyer';
+  const L={goods:buy?'Which products do you mainly buy on GeM? Tick all that apply.':'Which products do you mainly supply on GeM? Tick all that apply.',
+           services:buy?'Which services do you mainly buy on GeM? Tick all that apply.':'Which services do you mainly provide on GeM? Tick all that apply.'};
+  let k;
+  if(buy)k=d==='products'?['goods']:(d==='services'?['services']:(d==='both'?['goods','services']:[]));
+  else k=g==='Seller'?['goods']:(g==='Service provider'?['services']:['goods','services']);
+  return k.map(function(x){return {key:x,legend:L[x],opts:OPT[x]};});
+}
+function allowedCats(){return [].concat.apply([],catSets().map(function(x){return x.opts;}));}
+function profileMissing(){
+  const p=state.profile,m=[];
+  if(!clean(p.id))m.push('your GeM ID');
+  if(CFG.useCodes&&!clean(p.code))m.push('access code');
+  if(state.group==='Buyer'){
+    if(!clean(p.org))m.push('organisation');
+    if(!p.orgType)m.push('organisation type');
+    if(!p.deals)m.push('what you buy on GeM (products, services or both)');
+  }
+  if(!p.exp)m.push('experience on GeM');
+  if(!p.cats.length&&!clean(p.catOther))m.push('products or services');
+  if(state.group!=='Buyer'&&!p.types.length)m.push(typeLabel().toLowerCase());
+  return m;
+}
+function profileCols(group,p){
+  const cats=p.cats.concat(clean(p.catOther)?['Other: '+clean(p.catOther)]:[]).join('; ');
+  if(group==='Buyer')return {head:['Organization','Organization type','Experience on GeM','Buys on GeM','Products / services dealt'],val:[clean(p.org),clean(p.orgType),clean(p.exp),clean(DEALS_LABEL[p.deals]||''),clean(cats)]};
+  return {head:['Experience on GeM','Products / services dealt','Business type'],val:[clean(p.exp),clean(cats),clean(p.types.join('; '))]};
+}
+function selectHtml(id,label,opts,cur,list){
+  return '<label class="f" for="'+id+'">'+esc(tr(label))+'<select id="'+id+'"><option value="">'+esc(tr('Select…'))+'</option>'+opts.map(function(o){return '<option value="'+esc(o)+'"'+(o===cur?' selected':'')+'>'+esc(ol(list,o))+'</option>';}).join('')+'</select></label>';
+}
+function checksHtml(nameAttr,legend,opts,cur,list){
+  return '<fieldset><legend>'+esc(tr(legend))+'</legend><div class="checks">'+opts.map(function(o){
+    return '<label><input type="checkbox" name="'+nameAttr+'" value="'+esc(o)+'"'+(cur.indexOf(o)>=0?' checked':'')+'><span>'+esc(ol(list,o))+'</span></label>';
+  }).join('')+'</div></fieldset>';
+}
+function renderProfile(){
+  const g=state.group,p=state.profile;
+  const idLabel={'Buyer':'Your GeM Buyer ID','Seller':'Your GeM Seller ID','Service provider':'Your GeM Service Provider ID','Both':'Your GeM Seller / Service Provider ID'}[g];
+  let h='<div class="step-h"><div class="n">'+SN(2)+'</div><h2>'+esc(tr('Your details'))+'</h2><span class="chip" id="profChip"></span></div>';
+  const idField='<label class="f" for="rid">'+esc(tr(idLabel))+'<input type="text" id="rid" autocomplete="off" maxlength="60" value="'+esc(p.id)+'"></label>';
+  const codeField=CFG.useCodes?'<label class="f" for="p_code">'+esc(tr('Access code (sent to you by GeM)'))+'<input type="text" id="p_code" autocomplete="off" maxlength="40" value="'+esc(p.code)+'"></label>':'';
+  if(g==='Buyer'){
+    h+='<div class="row2">'+idField+(codeField?codeField+'</div><div class="row2">':'')+'<label class="f" for="p_org">'+esc(tr('Organisation'))+'<input type="text" id="p_org" autocomplete="off" maxlength="120" value="'+esc(p.org)+'"></label></div>';
+    h+='<div class="row2">'+selectHtml('p_orgType','Type of organisation',OPT.orgTypes,p.orgType,'orgTypes')+selectHtml('p_exp','Years of experience on GeM',OPT.experience,p.exp,'experience')+'</div>';
+    h+='<label class="f" for="p_deals">'+esc(tr('What do you buy on GeM?'))+'<select id="p_deals"'+(state.savedT.length?' disabled':'')+'><option value="">'+esc(tr('Select\u2026'))+'</option>'+DEALS.map(function(d){return '<option value="'+d[0]+'"'+(p.deals===d[0]?' selected':'')+'>'+esc(tr(d[1]))+'</option>';}).join('')+'</select><span class="small muted" style="font-weight:400">'+esc(tr('Products only: you rate the Seller KPIs. Services only: you rate the Service provider KPIs. Both: you fill two forms, the Seller KPIs first and then the Service provider KPIs.'))+'</span></label>';
+  }else{
+    h+='<div class="row2">'+idField+(codeField?codeField+'</div><div class="row2">':'')+selectHtml('p_exp','Years of experience on GeM',OPT.experience,p.exp,'experience')+'</div>';
+  }
+  const sets=catSets();
+  sets.forEach(function(x){h+=checksHtml('cat',x.legend,x.opts,p.cats,x.key);});
+  if(sets.length)h+='<label class="f" for="p_catOther">'+esc(tr('Any other products or services (optional)'))+'<input type="text" id="p_catOther" autocomplete="off" maxlength="120" value="'+esc(p.catOther)+'"></label>';
+  if(g!=='Buyer')h+=checksHtml('typ',typeLabel()+'. Tick all that apply.',OPT.sellerTypes,p.types,'sellerTypes');
+  $('sP').innerHTML=h;
+  updateProfChip();
+}
+function updateProfChip(){
+  const c=$('profChip');if(!c)return;
+  const miss=profileMissing().length===0;
+  c.className='chip '+(miss?'done':'todo');c.textContent=miss?tr('Done'):tr('To do');
+}
+function profileChanged(){updateProfChip();renderReview();}
+
+/* ---------- rendering ---------- */
+function chip(done,locked){return '<span class="chip '+(done?'done':(locked?'':'todo'))+'">'+tr(done?'Done':(locked?'Locked':'To do'))+'</span>';}
+
+function renderGroup(){
+  const hint=!state.chosen?(ROLES.indexOf('Buyer')<0?'Sellers and service providers rate the Buyer KPIs. You will fill one form.':'Buyers rate the Seller and Service provider KPIs. Sellers and service providers rate the Buyer KPIs.')
+    :(state.group==='Buyer'?'You will rate the Seller KPIs, the Service provider KPIs or both, depending on what you buy.'
+    :'You will fill one form: the Buyer KPIs.');
+  let h='<div class="step-h"><div class="n">'+SN(1)+'</div><h2>'+esc(tr('Your role on GeM'))+'</h2>'+chip(state.chosen,false)+'</div>';
+  h+='<label class="f" for="roleSel">'+esc(tr('Please select the role in which you transact on GeM.'))+'<select id="roleSel"><option value=""'+(state.chosen?'':' selected')+'>'+esc(tr('Select\u2026'))+'</option>'+ROLES.map(function(g){return '<option value="'+esc(g)+'"'+(state.chosen&&state.group===g?' selected':'')+'>'+esc(tr(ROLE_LABEL[g]))+'</option>';}).join('')+'</select></label>';
+  h+='<p class="muted">'+esc(tr(hint))+'</p>';
+  $('s1').innerHTML=h;
+}
+function renderKpiInfo(){
+  const t=T(),k=KPIS[t],tl=targets();
+  const who={'Seller':'sellers','Service provider':'service providers','Buyer':'buyers'}[t];
+  let h='<div class="step-h"><div class="n">'+SN(3)+'</div><h2>'+(tl.length>1?fmt(tr('Form {i} of {n}: '),{i:state.tIdx+1,n:tl.length}):'')+fmt(tr('KPIs used to rate {who}'),{who:tr(who)})+'</h2></div>';
+  h+='<p class="muted">'+fmt(tr('You are rating the {t} KPIs ({n} in total). Read what each one measures, then rank them in the next step.'),{t:esc(tr(t)),n:k.length})+'</p><div class="defs">';
+  h+=k.map(function(x){
+    return '<div class="def"><div class="def-h"><b>'+esc(x.code)+'</b><span>'+esc(kName(x))+'</span>'+(x.theme?'<span class="chip">'+esc(kTheme(x))+'</span>':'')+'</div>'+(x.def?'<p>'+esc(kDef(x))+'</p>':'')+(x.parts.length?'<div class="sub">'+x.parts.map(function(p,pi){const q=kPart(x,p,pi);return '<div class="sub-i"><b>'+esc((q.label?q.label+': ':'')+q.name)+'</b><p>'+esc(q.def)+'</p></div>';}).join('')+'</div>':'')+'</div>';
+  }).join('');
+  h+='</div>';
+  $('sK').innerHTML=h;
+}
+function renderRank(){
+  const done=rankingDone(),n=N();
+  let h='<div class="step-h"><div class="n">'+SN(4)+'</div><h2>'+esc(tr('Rank the KPIs by importance'))+'</h2>'+chip(done,false)+'</div>';
+  h+='<p class="muted">'+fmt(tr('Tap the most important KPI first, then the next, until all {n} are numbered. If two feel equal, put either one first. You can show that later with an equal number.'),{n:LANG==='hi'?n:NWORD[n]})+'</p>';
+  h+='<div class="kpis">';
+  for(let i=0;i<n;i++){
+    const r=state.ranking.indexOf(i);
+    h+='<button type="button" class="kpi" data-kpi="'+i+'" aria-pressed="'+(r>=0)+'"'+(r>=0||done?' aria-disabled="true"':'')+'>'+(r>=0?'<span class="rk">'+(r+1)+'</span>':'')+'<b>'+esc(name(i))+'</b><span>'+esc(kName(kpi(i)))+'</span></button>';
+  }
+  h+='</div>';
+  if(state.ranking.length){
+    h+='<div class="order" aria-label="'+esc(tr('Your order'))+'">'+state.ranking.map(function(k,r){return '<span class="o"><i>'+(r+1)+'</i>'+esc(name(k))+'</span>';}).join('')+'</div>';
+  }
+  h+='<div class="btns">';
+  if(state.ranking.length&&!done)h+='<button type="button" class="btn" data-act="undo">'+esc(tr('Undo last'))+'</button>';
+  if(done)h+='<button type="button" class="btn" data-act="rerank">'+esc(tr('Change ranking'))+'</button>';
+  h+='</div>';
+  if(state.confirm==='rerank'){
+    h+='<div class="confirm">'+esc(tr('Changing the ranking clears your comparisons.'))+' <button type="button" class="btn" data-act="rerank-yes">'+esc(tr('Clear and re-rank'))+'</button><button type="button" class="btn" data-act="confirm-no">'+esc(tr('Keep'))+'</button></div>';
+  }
+  $('s2').innerHTML=h;
+}
+function optsHtml(cell,locked){
+  const ok=locked?[]:allowed(cell),cur=state.vals[cell];
+  const only=(!locked&&state.mode==='guided'&&ok.length===1&&cur==null)?ok[0]:null;
+  let h='<div class="opts" role="group">';
+  for(let v=1;v<=5;v++){
+    const isOk=ok.indexOf(v)>=0,sel=cur===v;
+    h+='<button type="button" class="opt'+(only===v?' only':'')+'" data-cell="'+cell+'" data-v="'+v+'" aria-pressed="'+sel+'"'+((!isOk&&!sel)||locked?' aria-disabled="true"':'')+' aria-label="'+esc(lab(v)+', '+tr('number')+' '+v+((!isOk&&!sel)?', '+tr('not available'):''))+'"><span class="num">'+v+'</span><span class="bars" aria-hidden="true">'+visInner(v)+'</span><span class="lab">'+esc(lab(v))+'</span></button>';
+  }
+  h+='</div>';
+  if(only!=null)h+='<p class="only-note">'+fmt(tr('Only {n} fits your other answers.'),{n:only})+'</p>';
+  return h;
+}
+function reasonText(rs){
+  const A=state.vals[0],t=state.tol,cell=rs.cell,m=M();
+  if(rs.why==='cap')return fmt(tr('{v} is higher than your Best vs Worst answer ({A}). No answer can be higher than that.'),{v:rs.v,A:A});
+  if(rs.why==='order')return tr(cell<=m?'Order rule: numbers in this list stay the same or go up from top to bottom.':'Order rule: numbers in this list stay the same or go down from top to bottom.');
+  if(rs.why==='product')return fmt(tr('Product check: with your other answers, {v} would make them contradict each other. A KPI’s two numbers multiplied should be {lo} to {hi}.'),{v:rs.v,lo:A-t,hi:A+t});
+  return fmt(tr('{v} does not fit the order rule and the product check together with your other answers.'),{v:rs.v});
+}
+function rankLabel(r){return fmt(tr(r===N()-1?'Your last (#{r})':'Your #{r}'),{r:r+1});}
+function tagHtml(r,cls){return '<div class="tag '+cls+'"><span class="tag-r">'+esc(rankLabel(r))+'</span><b>'+esc(rankName(r))+'</b><small>'+esc(kName(kpi(state.ranking[r])))+'</small></div>';}
+function orderStrip(){
+  return '<div class="ostrip"><span>'+esc(tr('Your ranking:'))+'</span>'+state.ranking.map(function(k,r){return '<span class="o"><i>'+(r+1)+'</i>'+esc(name(k))+'</span>';}).join('')+'</div>';
+}
+function pairRow(cell,locked){
+  const p=cellPair(cell),a=rankName(p[0]),b=rankName(p[1]),cur=state.vals[cell];
+  const rs=state.reason&&state.reason.cell===cell?state.reason:null;
+  let h='<div class="pair"><div class="pair-tags">'+tagHtml(p[0],'a')+'<span class="vs">'+esc(tr('vs'))+'</span>'+tagHtml(p[1],'b')+'</div>';
+  const SA='<span class="ca">'+esc(a)+'</span>',SB='<span class="cb">'+esc(b)+'</span>';
+  h+='<p class="pair-q">'+fmt(tr('How much more does {a} matter than {b}?'),{a:SA,b:SB})+'</p>';
+  if(LOOK==='seesaw')h+='<p class="key dots"><span><i class="sw a"></i>'+fmt(tr('{a} is the left side: the lower it drops, the more it matters'),{a:esc(a)})+'</span><span><i class="sw b"></i>'+fmt(tr('{b} is the right side'),{b:esc(b)})+'</span></p>';
+  else h+='<p class="key"><span><i class="sw a"></i>'+fmt(tr('{a}: the longer the bar, the more it matters'),{a:esc(a)})+'</span><span><i class="sw b"></i>'+fmt(tr('{b}: stays the same'),{b:esc(b)})+'</span></p>';
+  h+=optsHtml(cell,locked);
+  if(cur!=null)h+='<p class="picked" role="status">'+fmt(tr(PICKT[cur]),{a:SA,b:SB})+'</p>';
+  if(rs)h+='<p class="why" role="status">'+esc(reasonText(rs))+'</p>';
+  return h+'</div>';
+}
+function renderAnswers(){
+  const rd=rankingDone(),m=M(),n=N();
+  let h='<div class="step-h"><div class="n">'+SN(5)+'</div><h2>'+esc(tr('Compare your top and lowest KPI'))+'</h2>'+chip(state.vals[0]!=null,!rd)+'</div>';
+  if(!rd){h+='<p class="muted">'+esc(tr('Finish the ranking first.'))+'</p>';}
+  else{
+    h+=LOOK==='seesaw'
+      ?'<div class="howto"><h3>'+esc(tr('How to compare'))+'</h3><p>'+tr('Each question compares two KPIs from your own ranking. Think of a see-saw. The <span class="ca">teal disc</span> on the left is the KPI you ranked higher. The <span class="cb">amber disc</span> on the right is the KPI you ranked lower. The lower the left side drops, the more the higher-ranked KPI matters to you. A level see-saw means both matter the same. There is no right or wrong answer.')+'</p></div>'
+      :'<div class="howto"><h3>'+esc(tr('How to compare'))+'</h3><p>'+tr('Each question compares two KPIs from your own ranking. The <span class="ca">teal bar</span> is the KPI you ranked higher. The <span class="cb">amber bar</span> is the KPI you ranked lower and it stays the same. The longer the teal bar, the more the higher-ranked KPI matters to you. There is no right or wrong answer.')+'</p></div>';
+    h+='<p class="muted">'+fmt(tr('First compare your top KPI, <b>{a}</b>, with your lowest KPI, <b>{b}</b>. This is the biggest difference on the form, so no other answer can be larger than it.'),{a:esc(rankName(0)),b:esc(rankName(n-1))})+'</p>';
+    h+=pairRow(0,false);
+  }
+  $('s3').innerHTML=h;$('s3').classList.toggle('locked',!rd);
+
+  const ready=rd&&state.vals[0]!=null;
+  let g='<div class="step-h"><div class="n">'+SN(6)+'</div><h2>'+esc(tr('Compare the remaining KPIs'))+'</h2>'+chip(allAnswers(),!ready)+'</div>';
+  if(!ready){g+='<p class="muted">'+fmt(esc(tr('Answer step {n} first.')),{n:SN(5)})+'</p>';}
+  else{
+    g+=orderStrip();
+    if(state.notice)g+='<p class="notice" role="status">'+esc(state.notice)+'</p>';
+    if(state.mode==='guided')g+='<p class="muted">'+esc(tr('Greyed-out numbers would contradict your earlier answers. Tap one to see why.'))+'</p>';
+    else g+='<p class="muted">'+esc(tr('Free mode: any number can be chosen. Problems are listed at the end.'))+'</p>';
+    g+='<div class="part"><h3>'+esc(tr('Your top KPI compared with each of the others'))+'</h3><p>'+esc(tr('Going down this list, each KPI is less important, so the number stays the same or goes up.'))+'</p></div>';
+    for(let c=1;c<=m;c++)g+=pairRow(c,false);
+    g+='<div class="part"><h3>'+esc(tr('Each of the others compared with your lowest KPI'))+'</h3><p>'+esc(tr('Going down this list, each KPI is less important, so the number stays the same or goes down.'))+'</p></div>';
+    for(let c=m+1;c<=2*m;c++)g+=pairRow(c,false);
+  }
+  $('s4').innerHTML=g;$('s4').classList.toggle('locked',!ready);
+}
+function afterSave(label,primary){
+  const tl=targets();
+  if(state.tIdx<tl.length-1)return '<p class="banner ok">'+fmt(tr('Next: form {i} of {n}, the {t} KPIs. Your details are kept.'),{i:state.tIdx+2,n:tl.length,t:esc(tr(tl[state.tIdx+1]))})+'</p><div class="btns"><button type="button" class="btn primary" data-act="nextform">'+fmt(tr('Continue to form {i}'),{i:state.tIdx+2})+'</button></div>';
+  return '<div class="btns"><button type="button" class="btn'+(primary?' primary':'')+'" data-act="next">'+label+'</button></div>';
+}
+function lockedStep(id,k,title,msg){
+  $(id).innerHTML='<div class="step-h"><div class="n">'+SN(k)+'</div><h2>'+esc(tr(title))+'</h2>'+chip(false,true)+'</div><p class="muted">'+esc(tr(msg))+'</p>';
+  $(id).classList.add('locked');
+}
+function boxHtml(id,labelKey,phKey,val){
+  const wc=wordCount(val);
+  return '<label class="f" for="'+id+'">'+fmt(esc(tr(labelKey)),{max:OBS_MAX})+'<textarea id="'+id+'" class="obs" rows="4" maxlength="900" placeholder="'+esc(tr(phKey))+'">'+esc(val)+'</textarea><span class="small muted obs-n'+(wc>=OBS_MAX?' full':'')+'" id="'+id+'Count">'+obsCountText(wc)+'</span></label>';
+}
+function renderReview(){
+  const full=rankingDone()&&allAnswers();
+  $('s7').hidden=!formsReady()||state.justSaved||state.demo;
+  if(!full){
+    lockedStep('s5',7,'Review your answers','Complete the steps above to see the checks.');
+    lockedStep('s7',8,'Missing KPIs and comments','Complete the steps above first.');
+    lockedStep('s8',9,'Consent and submission','Complete the steps above first.');
+    return;
+  }
+  $('s5').classList.remove('locked');$('s7').classList.remove('locked');
+  const r=runChecks(state.vals,state.tol,N()),A=state.vals[0];
+  let h='<div class="step-h"><div class="n">'+SN(7)+'</div><h2>'+esc(tr('Review your answers'))+'</h2>'+(r.ok?'<span class="chip done">'+tr('Passed')+'</span>':'<span class="chip todo">'+tr('Needs a look')+'</span>')+'</div>';
+  h+='<div class="order">'+state.ranking.map(function(k,i){return '<span class="o"><i>'+(i+1)+'</i>'+esc(name(k))+'</span>';}).join('')+'</div>';
+  h+='<div class="scroll"><table><thead><tr><th>'+esc(tr('Check'))+'</th><th>'+esc(tr('Result'))+'</th></tr></thead><tbody>';
+  const row=function(l,ok){return '<tr><td>'+l+'</td><td class="'+(ok?'pass':'fail')+'">'+tr(ok?'Pass':'Fail')+'</td></tr>';};
+  h+=row(esc(tr('Top list: numbers stay the same or go up')),r.up);
+  h+=row(esc(tr('Bottom list: numbers stay the same or go down')),r.low);
+  h+=row(fmt(esc(tr('No number is higher than the Best vs Worst answer ({A})')),{A:A}),r.cap);
+  r.prod.forEach(function(p,i){
+    h+=row(fmt(esc(tr('{k}: {x} × {y} = {p} (should be {lo} to {hi})')),{k:esc(rankName(i+1)),x:p.x,y:p.y,p:p.p,lo:p.lo,hi:p.hi}),p.ok);
+  });
+  h+='</tbody></table></div>';
+  h+=r.ok?'<p class="banner ok">'+esc(tr('All checks pass.'))+'</p>':'<p class="banner bad">'+esc(tr('Some checks fail. Ask the respondent whether to revise, or save as given and note it.'))+'</p>';
+  $('s5').innerHTML=h;
+  let m='<div class="step-h"><div class="n">'+SN(8)+'</div><h2>'+esc(tr('Missing KPIs and comments'))+'</h2><span class="chip">'+esc(tr('Optional'))+'</span></div>';
+  m+='<p class="muted">'+fmt(esc(tr('Please tell us if an important aspect is missing from the {t} KPIs. This is one of the main aims of this consultation.')),{t:esc(tr(T()))})+'</p>';
+  m+=boxHtml('miss','Any KPI we have missed? (optional, up to {max} words)','Name the KPI and tell us briefly why it matters.',state.missing);
+  m+=boxHtml('obs','Any other comment (optional, up to {max} words)','Any other point about the KPIs or the rating system that you would like to share.',state.obs);
+  $('s7').innerHTML=m;
+  renderSubmit();
+}
+function renderSubmit(){
+  if(!(rankingDone()&&allAnswers()))return;
+  $('s8').classList.remove('locked');
+  let h='<div class="step-h"><div class="n">'+SN(9)+'</div><h2>'+esc(tr('Consent and submission'))+'</h2>'+chip(state.justSaved,false)+'</div>';
+  if(state.demo){
+    h+='<p class="banner bad">'+esc(tr('These are example answers and cannot be saved.'))+'</p><div class="btns"><button type="button" class="btn" data-act="next">'+esc(tr('Clear form'))+'</button></div>';
+  }else if(state.justSaved&&SHEET_URL){
+    const st=state.lastRec?state.lastRec.sheet:'pending',more=state.tIdx<targets().length-1;
+    const okMsg=more?fmt(tr('Form {i} of {n} recorded.'),{i:state.tIdx+1,n:targets().length}):tr('Thank you. Your response has been recorded.');
+    if(st==='confirmed')h+='<p class="banner ok" role="status">'+okMsg+'</p>';
+    else if(st==='sent')h+='<p class="banner ok" role="status">'+(more?okMsg:tr('Thank you. Your response was sent.'))+'</p>';
+    else h+='<p class="banner bad" role="status">'+esc(tr('Your answers could not be sent yet. They are kept on this device and will be sent when the connection returns. Keep this page open, or press Try again.'))+(state.sheetErr&&!RESPONDENT?' Details: '+esc(state.sheetErr):'')+'</p><div class="btns"><button type="button" class="btn primary" data-act="retry">'+esc(tr('Try again'))+'</button></div>';
+    h+=afterSave(esc(tr('Submit another response')),false);
+  }else if(state.justSaved){
+    h+='<p class="banner ok" role="status">'+(state.db&&!state.saveNote?'Saved to the shared database.':'Saved. Copy the rows below into the calculator, then start the next respondent.')+'</p>'+(state.saveNote?'<p class="banner bad">'+esc(state.saveNote)+'</p>':'')+afterSave('Next respondent',true);
+  }else{
+    const miss=profileMissing(),rid=clean(state.profile.id);
+    h+='<div class="checks consent"><label><input type="checkbox" id="consent"'+(state.consent?' checked':'')+'><span>'+esc(tr('I agree to take part in this study. I understand that my responses, including my GeM ID, will be used only for this study by IIT Delhi and GeM and reported in combined form.'))+'</span></label></div>';
+    if(state.rejectMsg)h+='<p class="banner bad" role="status">'+esc(tr(state.rejectMsg))+'</p>';
+    if(miss.length)h+='<p class="notice" role="status">'+fmt(esc(tr('Before submitting, please complete "Your details": {list}.')),{list:esc(miss.map(tr).join(', '))})+'</p>';
+    else if(!state.consent)h+='<p class="notice" role="status">'+esc(tr('Please tick the consent box to submit your response.'))+'</p>';
+    if(rid&&list().some(function(x){return x.id===rid&&x.target===T();}))h+='<p class="notice">'+fmt(tr('A response with ID "{id}" is already saved for these KPIs on this device. Check the ID before saving again.'),{id:esc(rid)})+'</p>';
+    if(state.db&&state.canWrite===false)h+='<p class="banner bad">You can view responses but not save new ones. Ask the owner for Contributor access.</p>';
+    else h+='<div class="btns"><button type="button" class="btn primary" data-act="save"'+(state.saving||miss.length||!state.consent?' disabled':'')+'>'+esc(tr(state.saving?'Submitting…':'Submit response'))+'</button></div>';
+  }
+  $('s8').innerHTML=h;
+}
+
+/* ---------- records ---------- */
+function buildRec(ranking,v,prof,role,tabPrefix,obs,missing){
+  const n=N(),m=n-2,A=v[0],bo=new Array(n).fill(0),ow=new Array(n).fill(0);
+  bo[ranking[0]]=1;ow[ranking[0]]=A;
+  for(let k=1;k<=m;k++){bo[ranking[k]]=v[k];ow[ranking[k]]=v[m+k];}
+  bo[ranking[n-1]]=A;ow[ranking[n-1]]=1;
+  const pc=profileCols(role,prof),id=clean(prof.id);
+  return {
+    id:id,ref:id+'-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),role:ROLE_OUT[role]||role,target:T(),tab:(tabPrefix||'')+T()+' KPIs',mode:state.mode,tol:state.tol,at:new Date().toISOString(),
+    names:KPIS[T()].map(function(k){return k.code;}),ranking:ranking.map(name),best:name(ranking[0]),worst:name(ranking[n-1]),
+    A:A,pairs:v.slice(),bo:bo,ow:ow,code:clean(prof.code||''),lang:LANG,pHead:pc.head,pVal:pc.val,obs:clean(limitWords(String(obs||''),OBS_MAX)).replace(/\s+/g,' '),missing:clean(limitWords(String(missing||''),OBS_MAX)).replace(/\s+/g,' ')
+  };
+}
+function makeRecord(){return buildRec(state.ranking,state.vals,state.profile,state.group,'',state.obs,state.missing);}
+function calcRow(rec){return [rec.id,rec.role,rec.best,rec.worst].concat(rec.bo,rec.ow).map(clean).join('\t');}
+function csvCell(s){s=String(s);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
+function fullCsv(){
+  const maxP=Math.max.apply(null,[0].concat(shown().map(function(r){return r.pairs.length;})));
+  const head=['id','respondent_group','kpi_group_rated','profile','mode','tolerance','saved_at','ranking','best','worst','missing_kpi_suggestion','other_observation'];
+  for(let i=0;i<maxP;i++)head.push(i===0?'best_vs_worst':'pair_'+i);
+  const lines=[head.join(',')];
+  shown().forEach(function(rec){
+    const prof=(rec.pHead||[]).map(function(h,i){return h+': '+(rec.pVal||[])[i];}).join(' | ');
+    lines.push([rec.id,rec.role,rec.target,prof,rec.mode,rec.tol,rec.at,rec.ranking.join(' > '),rec.best,rec.worst,rec.missing||'',rec.obs||''].concat(rec.pairs).map(csvCell).join(','));
+  });
+  return lines.join('\n');
+}
+function renderSaved(){
+  const rows=shown(),total=list().length;
+  $('savedCount').textContent=String(total);
+  const pend=state.local.filter(function(r){return r.sheet==='pending';}).length;
+  let h='<div class="btns">'+(SHEET_URL?'<span class="chip done">Google Sheet</span>':(state.db?'<span class="chip done">Shared database</span>':'<span class="chip todo">This browser only</span>'))+'<span class="small muted">'+(SHEET_URL?'This list shows responses saved on this device. The sheet holds all devices.':(state.db?'Every signed-in device with access sees the same list.':'Responses stay on this device. Copy the rows after each respondent.'))+'</span></div>';
+  if(SHEET_URL&&pend)h+='<div class="confirm">'+pend+' response'+(pend>1?'s have':' has')+' not reached the sheet. <button type="button" class="btn" data-act="retry">Try again</button></div>';
+  if(state.dbErr)h+='<p class="notice">Shared database unavailable ('+esc(state.dbErr)+'). Using this browser only.</p>';
+  if(state.db&&state.local.length)h+='<div class="confirm">'+state.local.length+' response'+(state.local.length>1?'s are':' is')+' stored only on this device. <button type="button" class="btn" data-act="upload">Upload to shared database</button></div>';
+  if(state.uploadNote)h+='<p class="notice" role="status">'+esc(state.uploadNote)+'</p>';
+  if(!total){$('savedBody').innerHTML=h+'<p class="muted">Nothing saved yet.</p>';return;}
+  h+='<label class="f" style="max-width:260px">Show KPI group<select id="viewGroup">'+['All'].concat(GROUPS).map(function(g){return '<option'+(g===state.viewGroup?' selected':'')+'>'+esc(g)+'</option>';}).join('')+'</select></label>';
+  if(!rows.length){$('savedBody').innerHTML=h+'<p class="muted">No responses for these KPIs.</p>';return;}
+  h+='<div class="scroll"><table><thead><tr><th>ID</th><th>Respondent</th><th>KPIs rated</th><th>Best</th><th>Worst</th><th>Best vs Worst</th><th></th></tr></thead><tbody>';
+  rows.forEach(function(rec,i){
+    h+='<tr><td>'+esc(rec.id)+'</td><td>'+esc(rec.role)+'</td><td>'+esc(rec.target)+'</td><td>'+esc(rec.best)+'</td><td>'+esc(rec.worst)+'</td><td>'+esc(rec.A)+'</td><td><button type="button" class="btn" data-rm="'+i+'">Remove</button></td></tr>';
+  });
+  h+='</tbody></table></div>';
+  h+='<div style="display:grid;gap:6px"><h3>Rows for the calculator</h3><p class="small muted">Paste into the Responses sheet from row 7. Columns: ID, group, best, worst, then Best-to-Others and Others-to-Worst for each KPI, in the order of the KPI list in Settings. Use one workbook per group.</p>'
+    +'<textarea id="outRows" rows="'+Math.min(8,rows.length+1)+'" readonly>'+esc(rows.map(calcRow).join('\n'))+'</textarea>'
+    +'<div class="btns"><button type="button" class="btn primary" data-copy="outRows">Copy rows</button></div></div>';
+  h+='<div style="display:grid;gap:6px"><h3>Full records (CSV)</h3><p class="small muted">Includes the profile answers, ranking, mode, tolerance and time saved.</p>'
+    +'<textarea id="outCsv" rows="6" readonly>'+esc(fullCsv())+'</textarea>'
+    +'<div class="btns"><button type="button" class="btn" data-copy="outCsv">Copy CSV</button></div></div>';
+  $('savedBody').innerHTML=h;
+}
+
+/* ---------- Google Sheet ---------- */
+function sheetHeader(rec){
+  const n=rec.names.length,top=[],bot=[];
+  for(let k=2;k<=n-1;k++){top.push('Best vs '+ord(k));bot.push(ord(k)+' vs Worst');}
+  return ['GeM ID','Respondent group','KPI group rated'].concat(rec.pHead,['Best KPI','Worst KPI'],
+    rec.names.map(function(x){return 'Best-to-Others: '+x;}),rec.names.map(function(x){return 'Others-to-Worst: '+x;}),
+    ['Ranking','Best vs Worst'],top,bot,['Missing KPI suggestion','Other observation','Consent','Form language','Mode','Tolerance','Saved at','Ref']);
+}
+function sheetPayload(rec){
+  const row=[rec.id,rec.role,rec.target].concat(rec.pVal,[rec.best,rec.worst],rec.bo,rec.ow,[rec.ranking.join(' > ')],rec.pairs,[rec.missing||'',rec.obs||'','Yes',rec.lang==='hi'?'Hindi':'English',rec.mode,rec.tol,rec.at,rec.ref]);
+  return {key:SHEET_KEY,code:rec.code||'',ref:rec.ref,group:rec.tab+tabSuffixFor(rec.target),header:sheetHeader(rec),row:row};
+}
+async function sendToSheet(rec){
+  const body=JSON.stringify(sheetPayload(rec));
+  const opt={method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body};
+  let res;
+  try{res=await fetch(SHEET_URL,opt);}
+  catch(e){
+    // The browser may block reading the reply even though the request goes through. Send once more without reading it.
+    await fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:opt.headers,body:body});
+    return 'sent';
+  }
+  let j=null;try{j=await res.json();}catch(e){}
+  if(j&&j.ok)return 'confirmed';
+  const er=new Error(j&&j.error?String(j.error):'rejected');er.perm=!!(j&&j.error&&['code','closed','values','group','id','shape','key','full'].indexOf(j.error)>=0);throw er;
+}
+let flushing=false,retryN=0,retryTimer=null;
+function scheduleRetry(){
+  /* a failed send is tried again by itself: after 6, 12, 24, 30, 30 seconds, then it waits for the person to press Try again */
+  clearTimeout(retryTimer);
+  if(retryN>=5||!state.local.some(function(r){return r.sheet==='pending';}))return;
+  const wait=[6,12,24,30,30][retryN]*1000;retryN++;
+  retryTimer=setTimeout(function(){flushOutbox(true);},wait);
+}
+async function flushOutbox(auto){
+  if(!auto)retryN=0;
+  if(!SHEET_URL||flushing)return;
+  flushing=true;state.sheetErr='';
+  try{
+    for(const rec of state.local){
+      if(rec.sheet!=='pending')continue;
+      try{rec.sheet=await sendToSheet(rec);}catch(e){if(e&&e.perm){rec.sheet='rejected';continue;}state.sheetErr=String(e&&e.message||e);break;}
+    }
+  }finally{flushing=false;}
+  state.local=state.local.filter(function(r){return r.sheet!=='confirmed';});   /* the sheet has it: no copy is kept on this device */
+  lsSet('kif.saved.v2',state.local);
+  if(state.local.some(function(r){return r.sheet==='pending';}))scheduleRetry();else retryN=0;
+  renderReview();renderSaved();
+}
+async function sendTest(){
+  const note=$('testNote');note.textContent='Sending…';
+  const n=N(),s=getSets(),ex=(s.full.find(function(r){return r[0]===4;})||s.full[0]).slice();
+  const prof={id:'TEST',deals:'products',org:'Test organization',orgType:OPT.orgTypes[0]||'x',exp:OPT.experience[0]||'x',cats:OPT.goods.slice(0,1),catOther:'',types:OPT.sellerTypes.slice(0,1)};
+  const rec=buildRec([...Array(n).keys()],ex,prof,state.group,'TEST ');
+  try{const r=await sendToSheet(rec);note.textContent=r==='confirmed'?'Sheet confirmed the row.':'Sent. The browser cannot read the reply, so check the TEST tab.';}
+  catch(e){note.textContent='Failed: '+String(e&&e.message||e);}
+}
+async function doSave(){
+  if(state.saving)return;
+  if(profileMissing().length||!state.consent){renderSubmit();return;}
+  state.saving=true;state.saveNote='';renderSubmit();
+  const rec=makeRecord();
+  state.savedT.push(T());
+  const dsel=$('p_deals');if(dsel)dsel.disabled=true;
+  if(SHEET_URL){
+    rec.sheet='pending';
+    state.local.push(rec);state.lastRec=rec;lsSet('kif.saved.v2',state.local);
+    try{rec.sheet=await sendToSheet(rec);state.sheetErr='';state.rejectMsg='';}
+    catch(err){
+      if(err&&err.perm){
+        // The script refused this response for good (wrong code, closed, invalid). Take it back so the respondent can correct it.
+        state.local.splice(state.local.indexOf(rec),1);state.savedT.pop();lsSet('kif.saved.v2',state.local);
+        state.rejectMsg={code:'The access code does not match your GeM ID. Please check the code you were sent, correct it under "Your details" and submit again.',closed:'This consultation has closed. Your response could not be accepted.'}[err.message]||'Your response could not be accepted. Please contact the IIT Delhi team.';
+        const ds=$('p_deals');if(ds)ds.disabled=!!state.savedT.length;
+        state.saving=false;renderReview();renderSaved();return;
+      }
+      rec.sheet='pending';state.sheetErr=String(err&&err.message||err);
+    }
+    if(rec.sheet==='confirmed'){state.local=state.local.filter(function(x){return x!==rec;});}   /* the sheet has it: no copy is kept on this device */
+    lsSet('kif.saved.v2',state.local);
+    if(rec.sheet==='pending')scheduleRetry();
+    state.justSaved=true;state.saving=false;renderReview();renderSaved();return;
+  }
+  try{
+    if(state.db){await state.db.collection('responses').add(JSON.parse(JSON.stringify(rec)));}
+    else{state.local.push(rec);lsSet('kif.saved.v2',state.local);}
+    state.justSaved=true;
+  }catch(err){
+    state.local.push(rec);lsSet('kif.saved.v2',state.local);
+    state.justSaved=true;
+    state.saveNote='The shared database did not accept this save ('+((err&&err.code)||'error')+'). The response was kept in this browser. Upload it later from the Saved responses section.';
+  }
+  state.saving=false;renderReview();renderSaved();
+}
+async function removeRec(i){
+  const rec=shown()[i];if(!rec)return;
+  if(state.db){
+    try{await state.db.doc('responses/'+rec._id).delete();}
+    catch(err){state.uploadNote='Could not remove ('+((err&&err.code)||'error')+').';renderSaved();}
+  }else{
+    const k=state.local.indexOf(rec);
+    if(k>=0){state.local.splice(k,1);lsSet('kif.saved.v2',state.local);}
+    renderSaved();
+  }
+}
+async function uploadLocal(){
+  if(!state.db)return;
+  state.uploadNote='Uploading…';renderSaved();
+  let done=0;
+  try{
+    while(state.local.length){
+      await state.db.collection('responses').add(JSON.parse(JSON.stringify(state.local[0])));
+      state.local.shift();lsSet('kif.saved.v2',state.local);done++;
+    }
+    state.uploadNote='Uploaded '+done+' response'+(done===1?'':'s')+'.';
+  }catch(err){
+    state.uploadNote='Stopped after '+done+' ('+((err&&err.code)||'error')+'). The rest are still on this device.';
+  }
+  renderSaved();
+}
+function applyRemoteSetup(d){
+  if(!d||typeof d!=='object')return;
+  if(state.ranking.length||anyAnswers())return;
+  if(d.mode==='free'||d.mode==='guided')state.mode=d.mode;
+  if([0,1,2].indexOf(d.tol)>=0)state.tol=d.tol;
+  lsSet('kif.setup.v2',{mode:state.mode,tol:state.tol});
+  renderAll();
+}
+async function initDb(){
+  if(SHEET_URL)return;
+  if(!(window.claude&&typeof window.claude.use==='function'))return;
+  let db=null;
+  try{db=await window.claude.use('db');}catch(e){db=null;}
+  if(!db)return;
+  try{const u=await window.claude.use('user');if(u)state.canWrite=await u.can('data.write');}catch(e){}
+  try{const snap=await db.doc('config/setup').get();if(snap.exists)applyRemoteSetup(snap.data());}catch(e){}
+  state.db=db;
+  db.collection('responses').orderBy('at').limit(1000).onSnapshot(function(snap){
+    state.remote=snap.docs.map(function(d){return Object.assign({_id:d.id},d.data());});
+    state.dbErr='';
+    renderSaved();renderReview();
+  },function(err){
+    state.db=null;state.remote=null;state.dbErr=(err&&err.code)||'error';
+    renderSaved();renderReview();
+  });
+  renderSaved();renderReview();
+}
+
+function renderSetup(){
+  $('modeGuided').checked=state.mode==='guided';$('modeFree').checked=state.mode==='free';
+  $('tol').value=String(state.tol);
+  $('setupSummary').textContent=(state.mode==='guided'?'Guided':'Free')+' · tolerance ±'+state.tol;
+}
+function applyVisibility(){
+  $('sP').hidden=!state.chosen;
+  ['sK','s2','s3','s4','s5','s8'].forEach(function(id){$(id).hidden=!formsReady();});
+  $('s7').hidden=!formsReady()||state.justSaved||state.demo;
+}
+function renderAll(){
+  renderSetup();renderGroup();renderProfile();renderKpiInfo();renderRank();renderAnswers();renderReview();renderSaved();applyVisibility();
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click',function(e){
+  const t=e.target.closest('button');if(!t)return;
+  if(t.id==='langBtn'){setLang(LANG==='hi'?'en':'hi');return;}
+  if(t.dataset.kpi!=null){
+    const i=+t.dataset.kpi;
+    if(state.ranking.indexOf(i)<0&&!rankingDone()){state.ranking.push(i);state.justSaved=false;resetAnswers();renderRank();renderAnswers();renderReview();}
+    return;
+  }
+  if(t.dataset.cell!=null){pick(+t.dataset.cell,+t.dataset.v);return;}
+  const act=t.dataset.act;
+  if(act==='upload'){uploadLocal();return;}
+  if(act==='retry'){flushOutbox();return;}
+  if(act==='next'){state.tIdx=0;state.savedT=[];state.consent=false;state.rejectMsg='';clearForm();state.profile=blankProfile();renderAll();window.scrollTo(0,0);return;}
+  if(act==='nextform'){state.tIdx++;clearForm();renderAll();$('sK').scrollIntoView();return;}
+  if(act==='undo'){state.ranking.pop();renderRank();renderAnswers();renderReview();return;}
+  if(act==='rerank'){
+    if(anyAnswers()){state.confirm='rerank';renderRank();}
+    else{state.ranking=[];state.confirm=null;renderRank();renderAnswers();renderReview();}
+    return;
+  }
+  if(act==='rerank-yes'){state.ranking=[];resetAnswers();state.confirm=null;state.demo=false;renderRank();renderAnswers();renderReview();return;}
+  if(act==='confirm-no'){state.confirm=null;renderRank();return;}
+  if(act==='save'){doSave();return;}
+  if(t.dataset.rm!=null){
+    if(t.dataset.arm==='1'){removeRec(+t.dataset.rm);return;}
+    t.dataset.arm='1';t.textContent='Confirm';
+    setTimeout(function(){if(t.isConnected){t.dataset.arm='';t.textContent='Remove';}},3000);
+    return;
+  }
+  if(t.dataset.copy){
+    const ta=$(t.dataset.copy),txt=ta.value;
+    const fallback=function(){ta.focus();ta.select();let ok=false;try{ok=document.execCommand('copy');}catch(x){}t.textContent=ok?'Copied':'Selected: press Ctrl+C';};
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){t.textContent='Copied';},fallback);
+    }else fallback();
+    setTimeout(function(){if(t.isConnected)t.textContent=t.dataset.copy==='outRows'?'Copy rows':'Copy CSV';},2500);
+    return;
+  }
+  if(t.id==='fillExample'){
+    const s=getSets(),ex=(s.full.find(function(r){return r[0]===4;})||s.full[0]).slice();
+    state.chosen=true;if(state.group==='Buyer'&&!state.profile.deals)state.profile.deals='products';
+    state.ranking=[...Array(N()).keys()];state.vals=ex;state.reason=null;state.notice='';state.demo=true;state.justSaved=false;
+    renderAll();return;
+  }
+  if(t.id==='sendTest'){sendTest();return;}
+  if(t.id==='resetSetup'){
+    state.mode='guided';state.tol=1;persistSetup();clearForm();renderAll();return;
+  }
+});
+document.addEventListener('change',function(e){
+  const t=e.target;
+  if(t.id==='roleSel'){
+    const id=state.profile.id;
+    state.chosen=!!t.value;if(t.value)state.group=t.value;
+    state.tIdx=0;state.savedT=[];clearForm();state.profile=blankProfile();state.profile.id=id;
+    renderAll();return;
+  }
+  if(t.id==='consent'){state.consent=t.checked;renderSubmit();return;}
+  if(t.id==='p_deals'){
+    state.profile.deals=t.value;state.tIdx=0;clearForm();
+    state.profile.cats=state.profile.cats.filter(function(c){return allowedCats().indexOf(c)>=0;});renderProfile();
+    renderKpiInfo();renderRank();renderAnswers();renderReview();applyVisibility();updateProfChip();return;
+  }
+  if(t.name==='mode'){state.mode=t.value;persistSetup();resetAnswers();renderSetup();renderAnswers();renderReview();return;}
+  if(t.id==='tol'){state.tol=+t.value;persistSetup();resetAnswers();renderSetup();renderAnswers();renderReview();return;}
+  if(t.id==='viewGroup'){state.viewGroup=t.value;renderSaved();return;}
+  if(t.id==='p_orgType'){state.profile.orgType=t.value;profileChanged();return;}
+  if(t.id==='p_exp'){state.profile.exp=t.value;profileChanged();return;}
+  if(t.name==='cat'||t.name==='typ'){
+    const key=t.name==='cat'?'cats':'types';
+    state.profile[key]=[].slice.call(document.querySelectorAll('input[name="'+t.name+'"]:checked')).map(function(x){return x.value;});
+    profileChanged();return;
+  }
+});
+document.addEventListener('input',function(e){
+  const t=e.target;
+  if(t.id==='obs'||t.id==='miss'){
+    const lim=limitWords(t.value,OBS_MAX);
+    if(lim!==t.value)t.value=lim;
+    if(t.id==='obs')state.obs=t.value;else state.missing=t.value;
+    const c=$(t.id+'Count'),n=wordCount(t.value);
+    if(c){c.textContent=obsCountText(n);c.classList.toggle('full',n>=OBS_MAX);}
+    return;
+  }
+  if(t.id==='rid'){state.profile.id=t.value;profileChanged();return;}
+  if(t.id==='p_code'){state.profile.code=t.value;profileChanged();return;}
+  if(t.id==='p_org'){state.profile.org=t.value;profileChanged();return;}
+  if(t.id==='p_catOther'){state.profile.catOther=t.value;profileChanged();return;}
+});
+
+function renderHead(){
+  $('htmlRoot').lang=LANG;
+  $('hEye').textContent=tr('Stakeholder Consultation');
+  $('hTitle').textContent=tr('GeM 2.0 Rating Framework');
+  $('intro').innerHTML='<p>'+esc(tr('GeM and IIT Delhi are jointly building the GeM 2.0 Rating Framework, a fair and transparent rating system for buyers, sellers and service providers.'))+'</p>'
+    +'<p>'+esc(tr('This form is part of that study. Based on your experience on GeM, you will:'))+'</p>'
+    +'<ul><li>'+esc(tr('rank the performance measures (KPIs) and tell us how much more one matters than another'))+'</li><li>'+esc(tr('tell us about any important aspect or KPI we have missed'))+'</li></ul>'
+    +'<p>'+esc(tr('Your responses are collected for this research study only. They are analysed together with those of other stakeholders and reported in combined form. Your GeM ID is used only to avoid duplicate entries.'))+'</p>'
+    +'<p class="small muted">'+esc(tr('Time needed: about 10 minutes.'))+'</p>';
+  const b=$('langBtn');b.textContent=LANG==='hi'?'English':'हिन्दी';b.lang=LANG==='hi'?'en':'hi';
+  document.title=tr('GeM 2.0 Rating Framework');
+}
+function setLang(l){
+  LANG=l;try{localStorage.setItem('kif.lang',l);}catch(e){}
+  state.notice='';
+  renderHead();if(!CFG_ERR.length)renderAll();
+}
+if(SHEET_URL)$('sheetBox').hidden=false;
+renderHead();
+if(RESPONDENT){$('setup').hidden=true;$('s6').hidden=true;}
+if(HASH_GROUP)$('s1').hidden=true;
+if(CFG_ERR.length){
+  const b=$('cfgErr');b.hidden=false;
+  b.textContent='Form setup problem: the KPI list for '+CFG_ERR.join(', ')+' needs 3 to 7 KPIs, each with a code. Check KPI_DATA at the top of the file.';
+  ['s1','sP','sK','s2','s3','s4','s5','s7','s8','s6'].forEach(function(id){$(id).hidden=true;});
+}else{
+  renderAll();
+  if(HASH_GROUP)$('s1').hidden=true;
+  initDb();
+  if(SHEET_URL){window.addEventListener('online',flushOutbox);flushOutbox();}
+}
+})();
+</script>
+
+</body>
+</html>
