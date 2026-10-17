@@ -35,7 +35,7 @@
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--font);padding-inline:16px;padding-block:20px 64px;font-variant-numeric:tabular-nums;margin:0}
 .wrap{max-width:760px;margin-inline:auto;display:grid;gap:16px}
-h1{font-size:26px;line-height:1.2;margin:0;text-wrap:balance}
+h1{font-size:clamp(20px,3.1vw,25px);line-height:1.2;margin:0}
 h2{font-size:18px;line-height:1.3;margin:0;text-wrap:balance}
 h3{font-size:15px;margin:0 0 2px}
 p{margin:0}
@@ -135,7 +135,7 @@ legend{font-size:14px;font-weight:600;padding:0;margin-bottom:6px}
 .key.dots .sw{width:12px;height:12px;border-radius:50%}
 .opt[aria-disabled="true"] .bars .see circle{fill:var(--off)}
 .picked{font-size:14px;background:var(--surface-2);border-radius:6px;padding:6px 10px}
-.intro{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:14px 16px;display:grid;gap:8px;max-width:72ch}
+.intro{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:14px 16px;display:grid;gap:8px}
 .intro p,.intro ul{margin:0}.intro ul{padding-left:20px;display:grid;gap:2px}
 .consent label{align-items:flex-start}
 textarea.obs{font-family:var(--font);font-size:15px;line-height:1.5;white-space:pre-wrap;resize:vertical}
@@ -442,6 +442,7 @@ window.HI_UI={
 "Stakeholder Consultation":"हितधारक परामर्श",
 "Years of experience on GeM":"GeM पर अनुभव (वर्ष)",
 "GeM 2.0 Rating Framework":"GeM 2.0 रेटिंग फ्रेमवर्क",
+"From Stars to Evidence: Building a Fair Rating System for GeM":"सितारों से प्रमाण तक: GeM के लिए एक निष्पक्ष रेटिंग प्रणाली का निर्माण",
 "This form is part of that study. Based on your experience on GeM, you will:":"यह फ़ॉर्म इसी अध्ययन का हिस्सा है। GeM पर अपने अनुभव के आधार पर आप:",
 "rank the performance measures (KPIs) and tell us how much more one matters than another":"KPI (काम को परखने के पैमाने) को क्रम में रखेंगे और बताएँगे कि एक KPI दूसरे से कितना ज़्यादा ज़रूरी है",
 "tell us about any important aspect or KPI we have missed":"कोई ज़रूरी बात या KPI जो हमसे छूट गई हो, वह बताएँगे",
@@ -585,8 +586,9 @@ window.KPI_HI={
 
 <div class="wrap">
   <header class="head">
+    <div class="logos" style="display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:6px"><img src="images/iitd-dms-logo.png" alt="IIT Delhi - Department of Management Studies" style="height:56px;width:auto"><img src="images/gem-logo.png" alt="GeM - Government e Marketplace" style="height:120px;width:auto;margin:-22px 0 -30px"></div>
     <div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><div class="eyebrow" id="hEye">Stakeholder Consultation</div><button class="btn" id="langBtn" type="button" lang="hi" style="min-height:36px;padding:4px 14px">हिन्दी</button></div>
-    <h1 id="hTitle">GeM 2.0 Rating Framework</h1>
+    <h1 id="hTitle">From Stars to Evidence: Building a Fair Rating System for GeM</h1>
     <div class="intro" id="intro"></div>
   </header>
 
@@ -1425,7 +1427,7 @@ document.addEventListener('input',function(e){
 function renderHead(){
   $('htmlRoot').lang=LANG;
   $('hEye').textContent=tr('Stakeholder Consultation');
-  $('hTitle').textContent=tr('GeM 2.0 Rating Framework');
+  $('hTitle').textContent=tr('From Stars to Evidence: Building a Fair Rating System for GeM');
   $('intro').innerHTML='<p>'+esc(tr('GeM and IIT Delhi are jointly building the GeM 2.0 Rating Framework, a fair and transparent rating system for buyers, sellers and service providers.'))+'</p>'
     +'<p>'+esc(tr('This form is part of that study. Based on your experience on GeM, you will:'))+'</p>'
     +'<ul><li>'+esc(tr('rank the performance measures (KPIs) and tell us how much more one matters than another'))+'</li><li>'+esc(tr('tell us about any important aspect or KPI we have missed'))+'</li></ul>'
